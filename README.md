@@ -80,6 +80,12 @@ to the extension.
   to file URLs"
 - Open a new tab and try opening a local file; the controls should show up.
 
+### Contributing
+
+Install [Bun](https://bun.sh/) for the builder.
+If you want to edit the `inject.js` & `options.js`, do so only in `./src`
+`npm build`
+
 ### License
 
 (MIT License) - Copyright (c) 2014 Ilya Grigorik
