@@ -3,6 +3,6 @@
     "cws-publish": "^2.1.1"
   },
   "scripts": {
-    "build": "bun build ./src/options.js ./src/inject.js --outdir ./"
+    "build": "bun .bun/build.js"
   }
 }
