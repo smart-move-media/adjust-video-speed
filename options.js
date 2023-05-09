@@ -3,7 +3,6 @@ var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var SettingFieldsSynced = [
   "keyBindings",
   "version",
-  "displayKeyCode",
   "rememberSpeed",
   "forceLastSavedSpeed",
   "audioBoolean",
@@ -13,28 +12,23 @@ var SettingFieldsSynced = [
   "controllerOpacity",
   "logLevel",
   "blacklist",
-  "ifSpeedIsNormalDontSaveUnlessWeSetIt",
-  "ytAutoEnableClosedCaptions",
-  "ytAutoDisableAutoPlay"
+  "ifSpeedIsNormalDontSaveUnlessWeSetIt"
 ];
 var SettingFieldsBeforeSync = new Map;
 SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
 var tcDefaults = {
-  version: "0.5.3",
+  version: "0.8.3",
   lastSpeed: 1,
-  displayKeyCode: 86,
   rememberSpeed: false,
   audioBoolean: false,
   startHidden: false,
   forceLastSavedSpeed: false,
   enabled: true,
-  controllerOpacity: 0.3,
+  controllerOpacity: 0.38,
   logLevel: 3,
   defaultLogLevel: 4,
   speeds: {},
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
-  ytAutoEnableClosedCaptions: false,
-  ytAutoDisableAutoPlay: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -241,10 +235,6 @@ var restore_from_settingsObj = function(storage) {
   for (let i in storage.keyBindings) {
     var item = storage.keyBindings[i];
     if (item.predefined) {
-      if (item["action"] == "display" && typeof item["key"] === "undefined")
-        item["key"] = storage.displayKeyCode || tcDefaults.displayKeyCode;
-      if (customActionsNoValues.includes(item["action"]))
-        document.querySelector("#" + item["action"] + " .customValue").disabled = true;
       updateCustomShortcutInputText(document.querySelector("#" + item["action"] + " .customKey"), item["key"]);
       document.querySelector("#" + item["action"] + " .customValue").value = item["value"];
       document.querySelector("#" + item["action"] + " .customForce").value = item["force"];
@@ -252,8 +242,6 @@ var restore_from_settingsObj = function(storage) {
       add_shortcut();
       const dom = document.querySelector(".customs:last-of-type");
       dom.querySelector(".customDo").value = item["action"];
-      if (customActionsNoValues.includes(item["action"]))
-        dom.querySelector(".customValue").disabled = true;
       updateCustomShortcutInputText(dom.querySelector(".customKey"), item["key"]);
       dom.querySelector(".customValue").value = item["value"];
       dom.querySelector(".customForce").value = item["force"];
@@ -323,7 +311,13 @@ var keyCodeAliases = {
   221: "]",
   222: "'"
 };
-var customActionsNoValues = ["pause", "muted", "mark", "jump", "display"];
+var customActionsNoValues = [
+  "pause",
+  "muted",
+  "mark",
+  "jump",
+  "display"
+];
 document.addEventListener("DOMContentLoaded", function() {
   restore_options();
   codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, [

@@ -1,10 +1,10 @@
 {
-  "name": "Video Speed Controller",
-  "short_name": "videospeed",
-  "version": "0.7.3",
+  "name": "Adjust Video Speed",
+  "short_name": "adjustvideospeed",
+  "version": "0.8.3",
   "manifest_version": 3,
   "minimum_chrome_version": "89",
-  "description": "Speed up, slow down, advance and rewind HTML5 audio/video with shortcuts",
+  "description": "Change audio/video playback speeds with shortcuts",
   "homepage_url": "https://github.com/igrigorik/videospeed",
   "icons": {
     "16": "icons/icon16.png",

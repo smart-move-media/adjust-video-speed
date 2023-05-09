@@ -13,11 +13,54 @@
   </head>
   <body>
     <header>
-      <h1>Video Speed Controller</h1>
+      <h1>Adjust Video Speed optons</h1>
     </header>
 
+    <button id="save">Save</button>
+    <button id="restore">Restore Defaults</button>
+    <button id="experimental">Show Advanced & Experimental Features</button>
+    <div id="status"></div>
+    <br /><br />
+
+    <section>
+      <h3>Basic Optons</h3>
+      <div class="row">
+        <label for="enabled">Enable</label>
+        <input id="enabled" type="checkbox" />
+      </div>
+      <div class="row">
+        <label for="startHidden">Hide controller by default</label>
+        <input id="startHidden" type="checkbox" />
+      </div>
+      <div class="row">
+        <label for="rememberSpeed">Remember playback speed</label>
+        <input id="rememberSpeed" type="checkbox" />
+      </div>
+      <div class="row">
+        <label for="audioBoolean">Work on audio</label>
+        <input id="audioBoolean" type="checkbox" />
+      </div>
+      <div class="row">
+        <label for="controllerOpacity">Controller opacity</label>
+        <input id="controllerOpacity" type="text" value="" />
+      </div>
+      <div class="row">
+        <label for="blacklist"
+          >Sites on which extension is disabled<br />
+          (one per line)<br />
+          <br />
+          <em>
+            <a href="https://www.regexpal.com/">Regex</a> is supported.<br />
+            Be sure to use the literal notation.<br />
+            ie: /(.+)youtube\.com(\/*)$/gi
+          </em>
+        </label>
+        <textarea id="blacklist" rows="8" cols="50"></textarea>
+      </div>
+    </section>
+
     <section id="customs">
-      <h3>Shortcuts</h3>
+      <h3>Keyboard Shortcuts</h3>
       <div class="row customs" id="display">
         <select class="customDo">
           <option value="display">Show/hide controller</option>
@@ -119,7 +162,7 @@
           <option value="true">Disable website key bindings</option>
         </select>
       </div>
-      <div class="row customs" id="fast">
+      <!-- <div class="row customs" id="fast">
         <select class="customDo">
           <option value="fast">Preferred speed</option>
         </select>
@@ -133,97 +176,59 @@
         <select class="customForce">
           <option value="false">Do not disable website key bindings</option>
           <option value="true">Disable website key bindings</option>
-        </select>
+        </select> -->
       </div>
 
       <button id="add">Add New</button>
     </section>
 
-    <section>
-      <h3>Other</h3>
-      <div class="row">
-        <label for="enabled">Enable</label>
-        <input id="enabled" type="checkbox" />
-      </div>
-      <div class="row">
-        <label for="startHidden">Hide controller by default</label>
-        <input id="startHidden" type="checkbox" />
-      </div>
-      <div class="row">
-        <label for="rememberSpeed">Remember playback speed</label>
-        <input id="rememberSpeed" type="checkbox" />
-      </div>
-      <div class="row">
-        <label for="forceLastSavedSpeed">Force last saved speed<br />
-        <em>Useful for video players that override the speeds set by VideoSpeed</em></label>
-        <input id="forceLastSavedSpeed" type="checkbox" />
-      </div>
-      <div class="row">
-        <label for="ifSpeedIsNormalDontSaveUnlessWeSetIt">Don't allow normal (1.0) speed to be saved to DB unless we set it ourselves<br />
-        <em>Useful for making sure sites don't screw last used value</em></label>
-        <input id="ifSpeedIsNormalDontSaveUnlessWeSetIt" type="checkbox" />
-      </div>
 
+    <section class="customForce">
+      <h3>CAUTION: Advanced Options</h3>
       <div class="row">
-        <label for="audioBoolean">Work on audio</label>
-        <input id="audioBoolean" type="checkbox" />
+        <label for="forceLastSavedSpeed">Force last saved speed</label>
+        <input id="forceLastSavedSpeed" type="checkbox" />
+        <em>Useful for video players that override the speeds set by VideoSpeed</em>
       </div>
       <div class="row">
+        <label for="ifSpeedIsNormalDontSaveUnlessWeSetIt">Disable speed 1.0 autosave</label>
+        <input id="ifSpeedIsNormalDontSaveUnlessWeSetIt" type="checkbox" />
+        <em></em>Don't allow normal (1.0) speed to be saved to DB unless we manually set it<br />
+        Useful for making sure sites don't override last used value</em>
+      </div>
+      <!-- <div class="row">
         <label for="ytAutoEnableClosedCaptions">For Youtube.com auto enable closed captions</label>
         <input id="ytAutoEnableClosedCaptions" type="checkbox" />
-      </div>
-      <div class="row">
+      </div> -->
+      <!-- <div class="row">
         <label for="ytAutoDisableAutoPlay">For Youtube.com auto disable autoplay</label>
         <input id="ytAutoDisableAutoPlay" type="checkbox" />
-      </div>
+      </div> -->
       <div class="row">
         <label for="logLevel">Console Log Level</label>
         <select id="logLevel">
-          <option value="2">Error</option>
-          <option value="3">Warning</option>
-          <option value="4">Info</option>
-          <option value="5">Debug</option>
-          <option value="6">Verbose</option>
+          <option value="2">2: Error</option>
+          <option value="3">3: Warning</option>
+          <option value="4">4: Info</option>
+          <option value="5">5: Debug</option>
+          <option value="6">6: Verbose</option>
         </select>
       </div>
-      <div class="row">
-        <label for="controllerOpacity">Controller opacity</label>
-        <input id="controllerOpacity" type="text" value="" />
-      </div>
-      <div class="row">
-        <label for="blacklist"
-          >Sites on which extension is disabled<br />
-          (one per line)<br />
-          <br />
-          <em>
-            <a href="https://www.regexpal.com/">Regex</a> is supported.<br />
-            Be sure to use the literal notation.<br />
-            ie: /(.+)youtube\.com(\/*)$/gi
-          </em>
-        </label>
-        <textarea id="blacklist" rows="10" cols="50"></textarea>
+
+      <div>
+        <!-- <fieldset>
+          <legend>Javascript to execute on youtube.com domains</legend>
+        <code-input lang="javascript" id="ytJS" style="resize: vertical; overflow: auto; height: 200px; width: 700px;" class="language-js-extras"></code-input>
+      </fieldset>
+        <br /> -->
+        <fieldset>
+            <legend>Raw JSON Settings Edit</legend>
+          <code-input lang="JSON" id="rawJson" style="resize: vertical; overflow: auto; height: 400px; width: 700px;"></code-input>
+              <br />
+              <button id="saveRaw">Save From RawJson</button>
+        </fieldset>
       </div>
     </section>
-
-    <button id="save">Save</button>
-    <button id="restore">Restore Defaults</button>
-    <button id="experimental">Show Experimental Features</button>
-    <div id="status"></div>
-    <br /><br /><br />
-    <div class="customForce">
-
-   <!-- <fieldset>
-      <legend>Javascript to execute on youtube.com domains</legend>
-    <code-input lang="javascript" id="ytJS" style="resize: vertical; overflow: auto; height: 200px; width: 700px;" class="language-js-extras"></code-input>
-  </fieldset>
-    <br /> -->
-   <fieldset>
-      <legend>Raw JSON Settings Edit</legend>
-    <code-input lang="JSON" id="rawJson" style="resize: vertical; overflow: auto; height: 400px; width: 700px;"></code-input>
-        <br />
-        <button id="saveRaw">Save From RawJson</button>
-   </fieldset>
-</div>
 
     <div id="faq">
       <hr />
@@ -238,7 +243,6 @@
         is not available. You can try manually disabling Flash plugin in the
         browser:
       </p>
-
       <ul>
         <li>
           In a new tab, navigate to <code>chrome://settings/content/flash</code>
@@ -252,7 +256,6 @@
         To enable playback of local media (e.g. File &gt; Open File), you need
         to grant additional permissions to the extension.
       </p>
-
       <ul>
         <li>In a new tab, navigate to <code>chrome://extensions</code></li>
         <li>

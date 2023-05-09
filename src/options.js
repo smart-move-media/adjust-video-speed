@@ -107,7 +107,14 @@ function updateCustomShortcutInputText(inputItem, keyCode) {
 }
 
 // List of custom actions for which customValue should be disabled
-var customActionsNoValues = ["pause", "muted", "mark", "jump", "display"];
+
+const customActionsNoValues = [
+  "pause",
+  "muted",
+  "mark",
+  "jump",
+  "display",
+];
 
 function add_shortcut() {
   var html = `<select class="customDo">
@@ -305,14 +312,14 @@ function restore_from_settingsObj(storage) {
       if (item.predefined) {
         //do predefined ones because their value needed for overlay
         // document.querySelector("#" + item["action"] + " .customDo").value = item["action"];
-        if (item["action"] == "display" && typeof item["key"] === "undefined") {
-          item["key"] = storage.displayKeyCode || tcDefaults.displayKeyCode; // V
-        }
+        // if (item["action"] == "display" && typeof item["key"] === "undefined") {
+        //   item["key"] = storage.displayKeyCode || tcDefaults.displayKeyCode; // V
+        // }
 
-        if (customActionsNoValues.includes(item["action"]))
-          document.querySelector(
-            "#" + item["action"] + " .customValue"
-          ).disabled = true;
+        // if (customActionsNoValues.includes(item["action"])) outdated
+        //   document.querySelector(
+        //     "#" + item["action"] + " .customValue"
+        //   ).disabled = true;
 
         updateCustomShortcutInputText(
           document.querySelector("#" + item["action"] + " .customKey"),
@@ -328,8 +335,8 @@ function restore_from_settingsObj(storage) {
         const dom = document.querySelector(".customs:last-of-type");
         dom.querySelector(".customDo").value = item["action"];
 
-        if (customActionsNoValues.includes(item["action"]))
-          dom.querySelector(".customValue").disabled = true;
+        // if (customActionsNoValues.includes(item["action"]))
+        //   dom.querySelector(".customValue").disabled = true;
 
         updateCustomShortcutInputText(
           dom.querySelector(".customKey"),

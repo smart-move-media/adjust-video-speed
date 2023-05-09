@@ -19,14 +19,7 @@ for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`,3);
 }
-/* Log levels (depends on caller specifying the correct level)
-  1 - none
-  2 - error
-  3 - warning
-  4 - info
-  5 - debug
-  6 - debug high verbosity + stack trace on each message
-*/
+
 function log(message, level) {
   verbosity = tc.settings.logLevel;
   message = `${log.caller?.name ?? "null"}: ${message}`;
@@ -81,18 +74,18 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     }
   }
 
-  // ensure that there is a "display" binding (for upgrades from versions that had it as a separate binding)
-  if (
-    tc.settings.keyBindings.filter((x) => x.action == "display").length == 0
-  ) {
-    tc.settings.keyBindings.push({
-      action: "display",
-      key: Number(storage.displayKeyCode) || 86,
-      value: 0,
-      force: false,
-      predefined: true
-    }); // default V
-  }
+  // // ensure that there is a "display" binding (for upgrades from versions that had it as a separate binding)
+  // if (
+  //   tc.settings.keyBindings.filter((x) => x.action == "display").length == 0
+  // ) {
+  //   tc.settings.keyBindings.push({
+  //     action: "display",
+  //     key: Number(storage.displayKeyCode) || 86,
+  //     value: 0,
+  //     force: false,
+  //     predefined: true
+  //   }); // default V
+  // }
 
   initializeWhenReady(document);
 });
@@ -679,8 +672,8 @@ function initializeNow(document) {
   });
   log("End initializeNow", 5);
 
-  if ( window.location.hostname.endsWith("youtube.com") )
-    setTimeout(YTComAfterLoaded,1000);
+  // if ( window.location.hostname.endsWith("youtube.com") )
+  //   setTimeout(YTComAfterLoaded,1000);
     //eval(tc.settings.ytJS);
 
 }
@@ -688,18 +681,18 @@ function domItemByClass(classname){
   var subButton = document.getElementsByClassName("ytp-subtitles-button ytp-button");
   return subButton.length < 1 ? null : subButton[0];
 }
-function YTComAfterLoaded(){
-  if (tc.settings.ytAutoEnableClosedCaptions) {
-    let subButton = domItemByClass("ytp-subtitles-button ytp-button");
-    if (subButton && subButton.getAttribute("aria-pressed") == 'false')
-      subButton.click();
-  }
-  if (tc.settings.ytAutoDisableAutoPlay){
-    let subButton = domItemByClass("ytp-autonav-toggle-button");
-    if (subButton && subButton.getAttribute("aria-checked") == 'true')
-      subButton.click();
-  }
-}
+// function YTComAfterLoaded(){
+//   if (tc.settings.ytAutoEnableClosedCaptions) {
+//     let subButton = domItemByClass("ytp-subtitles-button ytp-button");
+//     if (subButton && subButton.getAttribute("aria-pressed") == 'false')
+//       subButton.click();
+//   }
+//   if (tc.settings.ytAutoDisableAutoPlay){
+//     let subButton = domItemByClass("ytp-autonav-toggle-button");
+//     if (subButton && subButton.getAttribute("aria-checked") == 'true')
+//       subButton.click();
+//   }
+// }
 function setSpeed(video, speed) {
   log("setSpeed started: " + speed, 5);
   var speedvalue = speed.toFixed(2);
