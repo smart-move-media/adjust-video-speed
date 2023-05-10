@@ -15,14 +15,15 @@
     <header>
       <h1>Adjust Video Speed optons</h1>
     </header>
-
-    <button id="save">Save</button>
+<!--
+    <button id="save">Save</button> -->
     <button id="restore">Restore Defaults</button>
-    <button id="experimental">Show Advanced & Experimental Features</button>
+    <!-- <button id="experimental">Show Advanced & Experimental Features</button>  -->
+      
     <div id="status"></div>
     <br /><br />
 
-    <section>
+    <!-- <section>
       <h3>Basic Optons</h3>
       <div class="row">
         <label for="enabled">Enable</label>
@@ -57,7 +58,7 @@
         </label>
         <textarea id="blacklist" rows="8" cols="50"></textarea>
       </div>
-    </section>
+    </section> 
 
     <section id="customs">
       <h3>Keyboard Shortcuts</h3>
@@ -176,7 +177,8 @@
         <select class="customForce">
           <option value="false">Do not disable website key bindings</option>
           <option value="true">Disable website key bindings</option>
-        </select> -->
+        </select> 
+
       </div>
 
       <button id="add">Add New</button>
@@ -185,7 +187,7 @@
 
     <section class="customForce">
       <h3>CAUTION: Advanced Options</h3>
-      <div class="row">
+      <!-- <div class="row">
         <label for="forceLastSavedSpeed">Force last saved speed</label>
         <input id="forceLastSavedSpeed" type="checkbox" />
         <em>Useful for video players that override the speeds set by VideoSpeed</em>
@@ -203,7 +205,7 @@
       <!-- <div class="row">
         <label for="ytAutoDisableAutoPlay">For Youtube.com auto disable autoplay</label>
         <input id="ytAutoDisableAutoPlay" type="checkbox" />
-      </div> -->
+      </div> 
       <div class="row">
         <label for="logLevel">Console Log Level</label>
         <select id="logLevel">
@@ -213,7 +215,7 @@
           <option value="5">5: Debug</option>
           <option value="6">6: Verbose</option>
         </select>
-      </div>
+      </div> 
 
       <div>
         <!-- <fieldset>
@@ -223,7 +225,11 @@
         <br /> -->
         <fieldset>
             <legend>Raw JSON Settings Edit</legend>
-          <code-input lang="JSON" id="rawJson" style="resize: vertical; overflow: auto; height: 400px; width: 700px;"></code-input>
+              <code-input
+                lang="JSON"
+                id="rawJson"
+                style="resize:vertical; overflow:auto; height:400px; width:650px;">
+              </code-input>
               <br />
               <button id="saveRaw">Save From RawJson</button>
         </fieldset>

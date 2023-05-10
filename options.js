@@ -60,209 +60,34 @@ var recordKeyPress = function(e) {
     e.target.keyCode = null;
   }
 };
-var inputFilterNumbersOnly = function(e) {
-  var char = String.fromCharCode(e.keyCode);
-  if (!/[\d\.]$/.test(char) || !/^\d+(\.\d*)?$/.test(e.target.value + char)) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-};
 var inputFocus = function(e) {
   e.target.value = "";
 };
 var inputBlur = function(e) {
   e.target.value = keyCodeAliases[e.target.keyCode] || String.fromCharCode(e.target.keyCode);
 };
-var updateCustomShortcutInputText = function(inputItem, keyCode) {
-  inputItem.value = keyCodeAliases[keyCode] || String.fromCharCode(keyCode);
-  inputItem.keyCode = keyCode;
-};
-var add_shortcut = function() {
-  var html = `<select class="customDo">
-    <option value="slower">Decrease speed</option>
-    <option value="faster">Increase speed</option>
-    <option value="rewind">Rewind</option>
-    <option value="advance">Advance</option>
-    <option value="reset">Reset speed</option>
-    <option value="fast">Preferred speed</option>
-    <option value="muted">Mute</option>
-    <option value="pause">Pause</option>
-    <option value="mark">Set marker</option>
-    <option value="jump">Jump to marker</option>
-    <option value="display">Show/hide controller</option>
-    </select>
-    <input class="customKey" type="text" placeholder="press a key"/>
-    <input class="customValue" type="text" placeholder="value (0.10)"/>
-    <select class="customForce">
-    <option value="false">Do not disable website key bindings</option>
-    <option value="true">Disable website key bindings</option>
-    </select>
-    <button class="removeParent">X</button>`;
-  var div = document.createElement("div");
-  div.setAttribute("class", "row customs");
-  div.innerHTML = html;
-  var customs_element = document.getElementById("customs");
-  customs_element.insertBefore(div, customs_element.children[customs_element.childElementCount - 1]);
-};
-var createKeyBindings = function(item) {
-  const action = item.querySelector(".customDo").value;
-  const key = item.querySelector(".customKey").keyCode;
-  const value = Number(item.querySelector(".customValue").value);
-  const force = item.querySelector(".customForce").value;
-  const predefined = !!item.id;
-  keyBindings.push({
-    action,
-    key,
-    value,
-    force,
-    predefined
-  });
-};
-var validate = function() {
-  var valid = true;
-  var status = document.getElementById("status");
-  var blacklist = document.getElementById("blacklist");
-  blacklist.value.split("\n").forEach((match) => {
-    match = match.replace(regStrip, "");
-    if (match.startsWith("/"))
-      try {
-        var parts = match.split("/");
-        if (parts.length < 3)
-          throw "invalid regex";
-        var flags = parts.pop();
-        var regex = parts.slice(1).join("/");
-        var regexp = new RegExp(regex, flags);
-      } catch (err) {
-        status.textContent = "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
-        valid = false;
-        return;
-      }
-  });
-  return valid;
+var notify = function(msg) {
+  const status = document.getElementById("status");
+  status.textContent = msg;
+  setTimeout(function() {
+    status.textContent = "";
+  }, 2555);
 };
 var save_raw_options = function() {
-  var rawJ = JSON.parse(document.getElementById("rawJson").value);
-  restore_from_settingsObj(rawJ);
-  chrome.storage.sync.set(rawJ, function() {
-    var status = document.getElementById("status");
-    status.textContent = "Raw Options saved";
-    setTimeout(function() {
-      status.textContent = "";
-    }, 2000);
-  });
+  const rawJ = JSON.parse(document.getElementById("rawJson").value);
+  chrome.storage.sync.set(rawJ, () => notify("Raw Options saved"));
 };
-var save_options = function() {
-  if (validate() === false)
-    return;
-  keyBindings = [];
-  Array.from(document.querySelectorAll(".customs")).forEach((item) => createKeyBindings(item));
-  let saveObj = {};
-  for (let field of SettingFieldsSynced) {
-    let domElm = document.getElementById(field);
-    if (!domElm)
-      continue;
-    let origType = typeof tcDefaults[field];
-    let val = undefined;
-    switch (origType) {
-      case "string":
-        val = String(domElm.value);
-        break;
-      case "number":
-        val = Number(domElm.value);
-        break;
-      case "boolean":
-        val = Boolean(domElm.checked);
-        break;
-      default:
-        continue;
-    }
-    if (SettingFieldsBeforeSync.has(field))
-      val = SettingFieldsBeforeSync.get(field)(val);
-    saveObj[field] = val;
-  }
-  chrome.storage.sync.remove([
-    "resetSpeed",
-    "speedStep",
-    "fastSpeed",
-    "rewindTime",
-    "advanceTime",
-    "resetKeyCode",
-    "slowerKeyCode",
-    "fasterKeyCode",
-    "rewindKeyCode",
-    "advanceKeyCode",
-    "fastKeyCode"
-  ]);
-  document.getElementById("rawJson").value = JSON.stringify(saveObj, null, "\t");
-  chrome.storage.sync.set(saveObj, function() {
-    var status = document.getElementById("status");
-    status.textContent = "Options saved";
-    setTimeout(function() {
-      status.textContent = "";
-    }, 1000);
-  });
+var restore_json = function() {
+  document.getElementById("rawJson").value = JSON.stringify(tcDefaults, null, "\t");
+  const rawJ = JSON.parse(document.getElementById("rawJson").value);
+  chrome.storage.sync.set(rawJ, () => notify("Options reset"));
 };
 var restore_options = function() {
   chrome.storage.sync.get(tcDefaults, restore_from_settingsObj);
 };
 var restore_from_settingsObj = function(storage) {
-  for (let field of SettingFieldsSynced) {
-    let domElm = document.getElementById(field);
-    if (!domElm)
-      continue;
-    let origType = typeof tcDefaults[field];
-    let val = storage[field];
-    switch (origType) {
-      case "string":
-      case "number":
-        domElm.value = val;
-        break;
-      case "boolean":
-        domElm.checked = val;
-        break;
-      default:
-        continue;
-    }
-  }
   document.getElementById("rawJson").value = JSON.stringify(storage, null, "\t");
-  if (storage.keyBindings.filter((x) => x.action == "display").length == 0)
-    storage.keyBindings.push({
-      action: "display",
-      value: 0,
-      force: false,
-      predefined: true
-    });
-  for (let i in storage.keyBindings) {
-    var item = storage.keyBindings[i];
-    if (item.predefined) {
-      updateCustomShortcutInputText(document.querySelector("#" + item["action"] + " .customKey"), item["key"]);
-      document.querySelector("#" + item["action"] + " .customValue").value = item["value"];
-      document.querySelector("#" + item["action"] + " .customForce").value = item["force"];
-    } else {
-      add_shortcut();
-      const dom = document.querySelector(".customs:last-of-type");
-      dom.querySelector(".customDo").value = item["action"];
-      updateCustomShortcutInputText(dom.querySelector(".customKey"), item["key"]);
-      dom.querySelector(".customValue").value = item["value"];
-      dom.querySelector(".customForce").value = item["force"];
-    }
-  }
 };
-var restore_defaults = function() {
-  chrome.storage.sync.set(tcDefaults, function() {
-    restore_options();
-    document.querySelectorAll(".removeParent").forEach((button) => button.click());
-    var status = document.getElementById("status");
-    status.textContent = "Default options restored";
-    setTimeout(function() {
-      status.textContent = "";
-    }, 1000);
-  });
-};
-var show_experimental = function() {
-  document.querySelectorAll(".customForce").forEach((item) => item.style.display = "inline-block");
-};
-var keyBindings = [];
 var keyCodeAliases = {
   0: "null",
   null: "null",
@@ -324,10 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
     new codeInput.plugins.Indent
   ]));
   document.getElementById("saveRaw").addEventListener("click", save_raw_options);
-  document.getElementById("save").addEventListener("click", save_options);
-  document.getElementById("add").addEventListener("click", add_shortcut);
-  document.getElementById("restore").addEventListener("click", restore_defaults);
-  document.getElementById("experimental").addEventListener("click", show_experimental);
+  document.getElementById("restore").addEventListener("click", restore_json);
   function eventCaller(event, className, funcName) {
     if (!event.target.classList.contains(className))
       return;

@@ -2,6 +2,8 @@
 
 - Rather than hardcode each setting where we need it (and what to sync), the name of the synced settings is stored in an array we can use instead.  This allows for less boilerplate code.  Made new options easier to add and in fewer locations.  This should help prevent errors where a setting may not be synced or get overwritten if one file is updated without updating the other properly.  
 
+- JSON editor is now the only way to edit config.  Sorry, but maintaining GUI editor with many changes is tough.  Advantage is you can copy/paste configs if you want, or [CTRL-s] to save, [CTRL-o] to open.
+
 - new `SettingFieldsBeforeSync`  Map variable that contains any transformations we need to do on a settings field prior to syncing.
 
 - Added `logLevel` as an exposed setting so users can adjust.
@@ -15,5 +17,3 @@
 - Made button presses on options page a bit more obvious by animating them and adding hover styling.
 
 - Improved logging adding the caller information (where available) and more details when a video event happens incase there may be multiple video players to determine which one.
-
-- Added the ability to automatically enable subtitles and auto disable autoplay for youtube.com.

@@ -113,7 +113,7 @@ select {
 }
 
 .customForce {
-  display: none;
+  /* display: none; */
   width: 250px;
 }
 
