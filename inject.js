@@ -144,12 +144,12 @@ var defineVideoController = function() {
   tc.videoController.prototype.initializeControls = function() {
     log("initializeControls Begin", 5);
     const document2 = this.video.ownerDocument;
-    const speed = this.video.playbackRate.toFixed(2);
+    const speed = this.video.playbackRate;
     const rect = this.video.getBoundingClientRect();
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 0) + "px";
     const left = Math.max(rect.left - (offsetRect?.left || 0), 0) + "px";
-    log("Speed variable set to: " + speed, 5);
+    log("initializeControls: Speed set to: " + speed, 5);
     var wrapper = document2.createElement("div");
     wrapper.classList.add("vsc-controller");
     if (!this.video.currentSrc)
@@ -163,7 +163,7 @@ var defineVideoController = function() {
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">${speed}</span>
+          <span data-action="drag" class="draggable">${speed.toFixed(2)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -256,7 +256,7 @@ var setupListener = function() {
       return;
     var speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
-    var speed = Number(video.playbackRate.toFixed(2));
+    var speed = Number(video.playbackRate);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
@@ -459,15 +459,14 @@ var initializeNow = function(document2) {
 };
 var setSpeed = function(video, speed) {
   log("setSpeed started: " + speed, 5);
-  var speedvalue = speed.toFixed(2);
   if (tc.settings.forceLastSavedSpeed)
     video.dispatchEvent(new CustomEvent("ratechange", {
-      detail: { origin: "videoSpeed", speed: speedvalue }
+      detail: { origin: "videoSpeed", speed }
     }));
   else
-    video.playbackRate = Number(speedvalue);
+    video.playbackRate = Number(speed);
   var speedIndicator = video.vsc.speedIndicator;
-  speedIndicator.textContent = speedvalue;
+  speedIndicator.textContent = speed.toFixed(2);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);

@@ -202,7 +202,7 @@ function defineVideoController() {
   tc.videoController.prototype.initializeControls = function () {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
-    const speed = this.video.playbackRate.toFixed(2);
+    const speed = this.video.playbackRate;
     const rect = this.video.getBoundingClientRect();
     // getBoundingClientRect is relative to the viewport; style coordinates
     // are relative to offsetParent, so we adjust for that here. offsetParent
@@ -211,7 +211,7 @@ function defineVideoController() {
     const top = Math.max(rect.top - (offsetRect?.top || 0), 0) + "px";
     const left = Math.max(rect.left - (offsetRect?.left || 0), 0) + "px";
 
-    log("Speed variable set to: " + speed, 5);
+    log("initializeControls: Speed set to: " + speed, 5);
 
     var wrapper = document.createElement("div");
     wrapper.classList.add("vsc-controller");
@@ -233,7 +233,7 @@ function defineVideoController() {
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">${speed}</span>
+          <span data-action="drag" class="draggable">${speed.toFixed(2)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -279,6 +279,7 @@ function defineVideoController() {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
+    // specific website workarounds
     switch (true) {
       case location.hostname == "www.amazon.com":
       case location.hostname == "www.reddit.com":
@@ -376,7 +377,7 @@ function setupListener() {
       return;
     var speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
-    var speed = Number(video.playbackRate.toFixed(2));
+    var speed = Number(video.playbackRate);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     //console.log(event);
@@ -661,24 +662,25 @@ function initializeNow(document) {
     //eval(tc.settings.ytJS);
 
 }
+
 function domItemByClass(classname){
   var subButton = document.getElementsByClassName("ytp-subtitles-button ytp-button");
   return subButton.length < 1 ? null : subButton[0];
 }
+
 function setSpeed(video, speed) {
   log("setSpeed started: " + speed, 5);
-  var speedvalue = speed.toFixed(2);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(
       new CustomEvent("ratechange", {
-        detail: { origin: "videoSpeed", speed: speedvalue }
+        detail: { origin: "videoSpeed", speed: speed }
       })
     );
   } else {
-    video.playbackRate = Number(speedvalue);
+    video.playbackRate = Number(speed);
   }
   var speedIndicator = video.vsc.speedIndicator;
-  speedIndicator.textContent = speedvalue;
+  speedIndicator.textContent = speed.toFixed(2);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
