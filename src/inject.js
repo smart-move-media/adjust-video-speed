@@ -114,7 +114,7 @@ function defineVideoController() {
 
     this.video = target;
     this.parent = target.parentElement || parent;
-    storedSpeed = tc.settings.speeds[target.currentSrc];
+    storedSpeed = tc.settings.playersSpeed[target.currentSrc];
     if (!tc.settings.rememberSpeed) {
       if (!storedSpeed) {
         log(
@@ -135,7 +135,7 @@ function defineVideoController() {
     this.div = this.initializeControls();
 
     var mediaEventAction = function (event) {
-      storedSpeed = tc.settings.speeds[event.target.currentSrc];
+      storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
       if (!tc.settings.rememberSpeed) {
         if (!storedSpeed) {
           log("Overwriting stored speed to 1.0 (rememberSpeed not enabled)", 4);
@@ -145,10 +145,6 @@ function defineVideoController() {
         log("Setting reset keybinding to fast", 5);
         setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
       } else {
-        // log(
-        //   "Storing lastSpeed into tc.settings.speeds (rememberSpeed enabled)",
-        //   5
-        // );
         log("Recalling stored speed due to rememberSpeed being enabled_", 5);
         storedSpeed = tc.settings.lastSpeed;
       }
@@ -387,7 +383,7 @@ function setupListener() {
 
     log("Updating controller with new speed", 5);
     speedIndicator.textContent = speed.toFixed(2);
-    tc.settings.speeds[src] = speed;
+    tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
 

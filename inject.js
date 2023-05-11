@@ -27,7 +27,7 @@ var tcDefaults = {
   controllerOpacity: 0.38,
   logLevel: 3,
   defaultLogLevel: 4,
-  speeds: {},
+  playersSpeed: {},
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
@@ -84,7 +84,7 @@ var defineVideoController = function() {
     tc.mediaElements.push(target);
     this.video = target;
     this.parent = target.parentElement || parent;
-    storedSpeed = tc.settings.speeds[target.currentSrc];
+    storedSpeed = tc.settings.playersSpeed[target.currentSrc];
     if (!tc.settings.rememberSpeed) {
       if (!storedSpeed) {
         log("Overwriting stored speed to 1.0 due to rememberSpeed being disabled", 5);
@@ -99,7 +99,7 @@ var defineVideoController = function() {
     target.playbackRate = storedSpeed;
     this.div = this.initializeControls();
     var mediaEventAction = function(event) {
-      storedSpeed = tc.settings.speeds[event.target.currentSrc];
+      storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
       if (!tc.settings.rememberSpeed) {
         if (!storedSpeed) {
           log("Overwriting stored speed to 1.0 (rememberSpeed not enabled)", 4);
@@ -261,7 +261,7 @@ var setupListener = function() {
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
     speedIndicator.textContent = speed.toFixed(2);
-    tc.settings.speeds[src] = speed;
+    tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
       log("Storing lastSpeed in settings for the rememberSpeed feature", 5);

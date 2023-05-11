@@ -33,7 +33,7 @@ export let tcDefaults = {
   controllerOpacity: 0.38,
   logLevel: 3, // warning
   defaultLogLevel: 4, //for any command that doesn't specify a log level
-  speeds: {}, // empty object to hold speed for each source
+  playersSpeed: {}, // empty object to hold speed for each source
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true }, // V

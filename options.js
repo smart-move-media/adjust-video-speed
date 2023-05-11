@@ -27,7 +27,7 @@ var tcDefaults = {
   controllerOpacity: 0.38,
   logLevel: 3,
   defaultLogLevel: 4,
-  speeds: {},
+  playersSpeed: {},
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
