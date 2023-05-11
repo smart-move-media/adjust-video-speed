@@ -56,6 +56,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     }
     chrome.storage.sync.set(toSet);
   }
+  
   for (let field of SettingFieldsSynced){
     let origType = typeof(tcDefaults[field]);
     switch (origType){
@@ -73,19 +74,6 @@ chrome.storage.sync.get(tc.settings, function (storage) {
           break;
     }
   }
-
-  // // ensure that there is a "display" binding (for upgrades from versions that had it as a separate binding)
-  // if (
-  //   tc.settings.keyBindings.filter((x) => x.action == "display").length == 0
-  // ) {
-  //   tc.settings.keyBindings.push({
-  //     action: "display",
-  //     key: Number(storage.displayKeyCode) || 86,
-  //     value: 0,
-  //     force: false,
-  //     predefined: true
-  //   }); // default V
-  // }
 
   initializeWhenReady(document);
 });
@@ -681,18 +669,6 @@ function domItemByClass(classname){
   var subButton = document.getElementsByClassName("ytp-subtitles-button ytp-button");
   return subButton.length < 1 ? null : subButton[0];
 }
-// function YTComAfterLoaded(){
-//   if (tc.settings.ytAutoEnableClosedCaptions) {
-//     let subButton = domItemByClass("ytp-subtitles-button ytp-button");
-//     if (subButton && subButton.getAttribute("aria-pressed") == 'false')
-//       subButton.click();
-//   }
-//   if (tc.settings.ytAutoDisableAutoPlay){
-//     let subButton = domItemByClass("ytp-autonav-toggle-button");
-//     if (subButton && subButton.getAttribute("aria-checked") == 'true')
-//       subButton.click();
-//   }
-// }
 function setSpeed(video, speed) {
   log("setSpeed started: " + speed, 5);
   var speedvalue = speed.toFixed(2);
