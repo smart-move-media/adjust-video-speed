@@ -92,6 +92,12 @@ function setKeyBindings(action, value) {
   ] = value;
 }
 
+// UI output
+function getSpeedDisplay(speed) {
+  return speed.toFixed(2)
+}
+
+
 function defineVideoController() {
   // Data structures
   // ---------------
@@ -233,7 +239,7 @@ function defineVideoController() {
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">${speed.toFixed(2)}</span>
+          <span data-action="drag" class="draggable">${getSpeedDisplay(speed)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -375,7 +381,6 @@ function setupListener() {
     // a video controller attached to it.  If we do, ignore it.
     if (!video.vsc)
       return;
-    var speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
@@ -383,7 +388,7 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    speedIndicator.textContent = speed.toFixed(2);
+    video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -663,11 +668,6 @@ function initializeNow(document) {
 
 }
 
-function domItemByClass(classname){
-  var subButton = document.getElementsByClassName("ytp-subtitles-button ytp-button");
-  return subButton.length < 1 ? null : subButton[0];
-}
-
 function setSpeed(video, speed) {
   log("setSpeed started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
@@ -679,8 +679,7 @@ function setSpeed(video, speed) {
   } else {
     video.playbackRate = Number(speed);
   }
-  var speedIndicator = video.vsc.speedIndicator;
-  speedIndicator.textContent = speed.toFixed(2);
+  video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);

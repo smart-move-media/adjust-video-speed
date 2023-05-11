@@ -77,6 +77,9 @@ var getKeyBindings = function(action, what = "value") {
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
+var getSpeedDisplay = function(speed) {
+  return speed.toFixed(2);
+};
 var defineVideoController = function() {
   tc.videoController = function(target, parent) {
     if (target.vsc)
@@ -163,7 +166,7 @@ var defineVideoController = function() {
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">${speed.toFixed(2)}</span>
+          <span data-action="drag" class="draggable">${getSpeedDisplay(speed)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -254,13 +257,12 @@ var setupListener = function() {
   function updateSpeedFromEvent(video, event) {
     if (!video.vsc)
       return;
-    var speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    speedIndicator.textContent = speed.toFixed(2);
+    video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -465,8 +467,7 @@ var setSpeed = function(video, speed) {
     }));
   else
     video.playbackRate = Number(speed);
-  var speedIndicator = video.vsc.speedIndicator;
-  speedIndicator.textContent = speed.toFixed(2);
+  video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
