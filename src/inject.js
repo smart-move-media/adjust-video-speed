@@ -17,16 +17,12 @@ var tc = {
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
-    log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`,3);
+    log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
 }
 
-function log(message, level) {
-  verbosity = tc.settings.logLevel;
-  message = `${log.caller?.name ?? "null"}: ${message}`;
-  if (typeof level === "undefined") {
-    level = tc.settings.defaultLogLevel;
-  }
-  if (verbosity >= level) {
+function log(message, level=4) {
+  if (tc.settings.logLevel >= level) {
+    message = `${log.caller?.name ?? "unknown"}: ${message}`;
     if (level === 2) {
       console.log("ERROR:" + message);
     } else if (level === 3) {
@@ -123,10 +119,7 @@ function defineVideoController() {
     storedSpeed = tc.settings.playersSpeed[target.currentSrc];
     if (!tc.settings.rememberSpeed) {
       if (!storedSpeed) {
-        log(
-          "Overwriting stored speed to 1.0 due to rememberSpeed being disabled",
-          5
-        );
+        log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
         storedSpeed = 1.0;
       }
       setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
@@ -144,14 +137,14 @@ function defineVideoController() {
       storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
       if (!tc.settings.rememberSpeed) {
         if (!storedSpeed) {
-          log("Overwriting stored speed to 1.0 (rememberSpeed not enabled)", 4);
+          log("Setting stored speed to 1.0 (rememberSpeed not enabled)", 4);
           storedSpeed = 1.0;
         }
         // resetSpeed isn't really a reset, it's a toggle
         log("Setting reset keybinding to fast", 5);
         setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
       } else {
-        log("Recalling stored speed due to rememberSpeed being enabled_", 5);
+        log("Recalling stored speed; rememberSpeed is enabled_", 5);
         storedSpeed = tc.settings.lastSpeed;
       }
       // TODO: Check if explicitly setting the playback rate to 1.0 is
