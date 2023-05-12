@@ -1,7 +1,5 @@
 import {
-  // regStrip,
-  // SettingFieldsBeforeSync,
-  // SettingFieldsSynced,
+  regStrip,
   tcDefaults,
 } from "./common"
 

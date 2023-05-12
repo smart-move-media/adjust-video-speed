@@ -1,34 +1,15 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-var SettingFieldsSynced = [
-  "keyBindings",
-  "version",
-  "rememberSpeed",
-  "forceLastSavedSpeed",
-  "audioBoolean",
-  "startHidden",
-  "lastSpeed",
-  "enabled",
-  "controllerOpacity",
-  "logLevel",
-  "blacklist",
-  "ifSpeedIsNormalDontSaveUnlessWeSetIt"
-];
-var SettingFieldsBeforeSync = new Map;
-SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
 var tcDefaults = {
   version: "0.8.3",
   lastSpeed: 1,
-  rememberSpeed: false,
+  rememberSpeed: true,
   audioBoolean: false,
-  startHidden: false,
-  forceLastSavedSpeed: false,
-  enabled: true,
   controllerOpacity: 0.38,
-  logLevel: 3,
-  defaultLogLevel: 4,
-  playersSpeed: {},
+  enabled: true,
+  forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
+  startHidden: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -39,10 +20,12 @@ var tcDefaults = {
     { action: "fast", key: 71, value: 1.8, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
-    twitter.com
-    imgur.com
-    teams.microsoft.com
+  twitter.com
+  imgur.com
+  teams.microsoft.com
   `.replace(regStrip, ""),
+  logLevel: 3,
+  playersSpeed: {},
   mediaElements: []
 };
 

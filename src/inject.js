@@ -1,10 +1,11 @@
 import {
   regStrip,
-  SettingFieldsBeforeSync,
-  SettingFieldsSynced,
   tcDefaults,
 } from "./common"
-
+///"ytJS" sadly cant figure out a good way to execute js https://bugs.chromium.org/p/chromium/issues/detail?id=1207006 may eventually have a solution
+const SettingFieldsBeforeSync = new Map();
+SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
+const SettingFieldsSynced = Object.keys(tcDefaults)
 const regEndsWithFlags = /\/(?!.*(.).*\1)[gimsuy]*$/;
 
 var tc = {

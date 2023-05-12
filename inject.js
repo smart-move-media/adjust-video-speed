@@ -1,34 +1,15 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-var SettingFieldsSynced = [
-  "keyBindings",
-  "version",
-  "rememberSpeed",
-  "forceLastSavedSpeed",
-  "audioBoolean",
-  "startHidden",
-  "lastSpeed",
-  "enabled",
-  "controllerOpacity",
-  "logLevel",
-  "blacklist",
-  "ifSpeedIsNormalDontSaveUnlessWeSetIt"
-];
-var SettingFieldsBeforeSync = new Map;
-SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
 var tcDefaults = {
   version: "0.8.3",
   lastSpeed: 1,
-  rememberSpeed: false,
+  rememberSpeed: true,
   audioBoolean: false,
-  startHidden: false,
-  forceLastSavedSpeed: false,
-  enabled: true,
   controllerOpacity: 0.38,
-  logLevel: 3,
-  defaultLogLevel: 4,
-  playersSpeed: {},
+  enabled: true,
+  forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
+  startHidden: false,
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -39,20 +20,19 @@ var tcDefaults = {
     { action: "fast", key: 71, value: 1.8, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
-    twitter.com
-    imgur.com
-    teams.microsoft.com
+  twitter.com
+  imgur.com
+  teams.microsoft.com
   `.replace(regStrip, ""),
+  logLevel: 3,
+  playersSpeed: {},
   mediaElements: []
 };
 
 // src/inject.js
-var log = function(message, level) {
-  verbosity = tc.settings.logLevel;
-  message = `${log.caller?.name ?? "null"}: ${message}`;
-  if (typeof level === "undefined")
-    level = tc.settings.defaultLogLevel;
-  if (verbosity >= level) {
+var log = function(message, level = 4) {
+  if (tc.settings.logLevel >= level) {
+    message = `${log.caller?.name ?? "unknown"}: ${message}`;
     if (level === 2)
       console.log("ERROR:" + message);
     else if (level === 3)
@@ -90,7 +70,7 @@ var defineVideoController = function() {
     storedSpeed = tc.settings.playersSpeed[target.currentSrc];
     if (!tc.settings.rememberSpeed) {
       if (!storedSpeed) {
-        log("Overwriting stored speed to 1.0 due to rememberSpeed being disabled", 5);
+        log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
         storedSpeed = 1;
       }
       setKeyBindings("reset", getKeyBindings("fast"));
@@ -105,13 +85,13 @@ var defineVideoController = function() {
       storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
       if (!tc.settings.rememberSpeed) {
         if (!storedSpeed) {
-          log("Overwriting stored speed to 1.0 (rememberSpeed not enabled)", 4);
+          log("Setting stored speed to 1.0 (rememberSpeed not enabled)", 4);
           storedSpeed = 1;
         }
         log("Setting reset keybinding to fast", 5);
         setKeyBindings("reset", getKeyBindings("fast"));
       } else {
-        log("Recalling stored speed due to rememberSpeed being enabled_", 5);
+        log("Recalling stored speed; rememberSpeed is enabled_", 5);
         storedSpeed = tc.settings.lastSpeed;
       }
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
@@ -613,6 +593,9 @@ var showController = function(controller) {
     log("Hiding controller", 5);
   }, 2000);
 };
+var SettingFieldsBeforeSync = new Map;
+SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
+var SettingFieldsSynced = Object.keys(tcDefaults);
 var regEndsWithFlags = /\/(?!.*(.).*\1)[gimsuy]*$/;
 var tc = {
   settings: {
