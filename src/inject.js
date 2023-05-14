@@ -195,7 +195,7 @@ function defineVideoController() {
   tc.videoController.prototype.initializeControls = function () {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
-    const speed = this.video.playbackRate;
+    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     // getBoundingClientRect is relative to the viewport; style coordinates
     // are relative to offsetParent, so we adjust for that here. offsetParent
@@ -226,7 +226,7 @@ function defineVideoController() {
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">${speed.toFixed(7)}</span>
+          <span data-action="drag" class="draggable">${speed}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>

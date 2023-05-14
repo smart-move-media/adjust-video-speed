@@ -140,7 +140,7 @@ var defineVideoController = function() {
   tc.videoController.prototype.initializeControls = function() {
     log("initializeControls Begin", 5);
     const document2 = this.video.ownerDocument;
-    const speed = this.video.playbackRate;
+    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 0) + "px";
@@ -159,7 +159,7 @@ var defineVideoController = function() {
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">${speed.toFixed(7)}</span>
+          <span data-action="drag" class="draggable">${speed}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -251,7 +251,7 @@ var setupListener = function() {
     if (!video.vsc)
       return;
     var src = video.currentSrc;
-    var speed = video.playbackRate.toFixed(7);
+    var speed = Number(video.playbackRate).toFixed(7);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
