@@ -1,6 +1,6 @@
 export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 export let tcDefaults = {
-  version: "0.8.3",
+  version: "0.8.8",
   lastSpeed: 1.0,
   rememberSpeed: true,
   audioBoolean: false,
@@ -9,6 +9,22 @@ export let tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedSets: {
+    common: {
+      'snail': 0.1,
+      'turtle': 0.25,
+      'half': 0.5,
+      'slower': 0.75,
+      'slow': 0.9,
+      'normal': 1.0,
+      'fast': 1.1,
+      'faster': 1.25,
+      'speedy': 1.5,
+      'double': 2,
+      'blazing': 3,
+    },
+  },
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true }, // V
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true }, // S
@@ -24,7 +40,7 @@ export let tcDefaults = {
   teams.microsoft.com
   `.replace(regStrip, ""),
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
-  logLevel: 3, // warning
+  logLevel: 5, //3, // warning
   playersSpeed: {}, // empty object to hold speed for each source
   mediaElements: []
 };

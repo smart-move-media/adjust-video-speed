@@ -1,7 +1,7 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var tcDefaults = {
-  version: "0.8.3",
+  version: "0.8.8",
   lastSpeed: 1,
   rememberSpeed: true,
   audioBoolean: false,
@@ -10,6 +10,22 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedSets: {
+    common: {
+      snail: 0.1,
+      turtle: 0.25,
+      half: 0.5,
+      slower: 0.75,
+      slow: 0.9,
+      normal: 1,
+      fast: 1.1,
+      faster: 1.25,
+      speedy: 1.5,
+      double: 2,
+      blazing: 3
+    }
+  },
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -24,7 +40,7 @@ var tcDefaults = {
   imgur.com
   teams.microsoft.com
   `.replace(regStrip, ""),
-  logLevel: 3,
+  logLevel: 5,
   playersSpeed: {},
   mediaElements: []
 };

@@ -82,18 +82,11 @@ function getKeyBindings(action, what = "value") {
     return false;
   }
 }
-
 function setKeyBindings(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)[
     "value"
   ] = value;
 }
-
-// UI output
-function getSpeedDisplay(speed) {
-  return speed.toFixed(2)
-}
-
 
 function defineVideoController() {
   // Data structures
@@ -233,7 +226,7 @@ function defineVideoController() {
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">${getSpeedDisplay(speed)}</span>
+          <span data-action="drag" class="draggable">${speed.toFixed(7)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -376,13 +369,13 @@ function setupListener() {
     if (!video.vsc)
       return;
     var src = video.currentSrc;
-    var speed = Number(video.playbackRate);
+    var speed = Number(video.playbackRate).toFixed(7);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
+    video.vsc.speedIndicator.textContent = speed; //toFixed
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -662,8 +655,14 @@ function initializeNow(document) {
 
 }
 
+function getCurrentSpeedRanges(currentSpeed) {
+  log(`(${currentSpeed})`, 4);
+}
+
 function setSpeed(video, speed) {
+  speed = Number(speed).toFixed(7);
   log("setSpeed started: " + speed, 5);
+  getCurrentSpeedRanges(speed)
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(
       new CustomEvent("ratechange", {
@@ -671,9 +670,10 @@ function setSpeed(video, speed) {
       })
     );
   } else {
-    video.playbackRate = Number(speed);
+    video.playbackRate = speed;
+    log(`not forced ${speed}`)
   }
-  video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
+  video.vsc.speedIndicator.textContent = speed;
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -710,7 +710,7 @@ function runAction(action, value, e) {
         log("Increase speed", 5);
         // Maximum playback speed in Chrome is set to 16:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-        var s = Math.min(
+        const s = Math.min(
           (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
           16
         );
@@ -719,7 +719,7 @@ function runAction(action, value, e) {
         log("Decrease speed", 5);
         // Video min rate is 0.0625:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-        var s = Math.max(v.playbackRate - value, 0.07);
+        const s = Math.max(v.playbackRate - value, 0.07);
         setSpeed(v, s);
       } else if (action === "reset") {
         log("Reset speed", 5);
@@ -802,7 +802,6 @@ function setMark(v) {
   log("Adding marker", 5);
   v.vsc.mark = v.currentTime;
 }
-
 function jumpToMark(v) {
   log("Recalling marker", 5);
   if (v.vsc.mark && typeof v.vsc.mark === "number") {
@@ -832,7 +831,6 @@ function handleDrag(video, e) {
     parseInt(shadowController.style.left),
     parseInt(shadowController.style.top)
   ];
-
   const startDragging = (e) => {
     let style = shadowController.style;
     let dx = e.clientX - initialMouseXY[0];
@@ -840,7 +838,6 @@ function handleDrag(video, e) {
     style.left = initialControllerXY[0] + dx + "px";
     style.top = initialControllerXY[1] + dy + "px";
   };
-
   const stopDragging = () => {
     parentElement.removeEventListener("mousemove", startDragging);
     parentElement.removeEventListener("mouseup", stopDragging);

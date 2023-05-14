@@ -1,7 +1,7 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var tcDefaults = {
-  version: "0.8.3",
+  version: "0.8.8",
   lastSpeed: 1,
   rememberSpeed: true,
   audioBoolean: false,
@@ -10,6 +10,22 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedSets: {
+    common: {
+      snail: 0.1,
+      turtle: 0.25,
+      half: 0.5,
+      slower: 0.75,
+      slow: 0.9,
+      normal: 1,
+      fast: 1.1,
+      faster: 1.25,
+      speedy: 1.5,
+      double: 2,
+      blazing: 3
+    }
+  },
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -24,7 +40,7 @@ var tcDefaults = {
   imgur.com
   teams.microsoft.com
   `.replace(regStrip, ""),
-  logLevel: 3,
+  logLevel: 5,
   playersSpeed: {},
   mediaElements: []
 };
@@ -56,9 +72,6 @@ var getKeyBindings = function(action, what = "value") {
 };
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
-};
-var getSpeedDisplay = function(speed) {
-  return speed.toFixed(2);
 };
 var defineVideoController = function() {
   tc.videoController = function(target, parent) {
@@ -146,7 +159,7 @@ var defineVideoController = function() {
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">${getSpeedDisplay(speed)}</span>
+          <span data-action="drag" class="draggable">${speed.toFixed(7)}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -238,11 +251,11 @@ var setupListener = function() {
     if (!video.vsc)
       return;
     var src = video.currentSrc;
-    var speed = Number(video.playbackRate);
+    var speed = video.playbackRate.toFixed(7);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
+    video.vsc.speedIndicator.textContent = speed;
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -439,15 +452,22 @@ var initializeNow = function(document2) {
   });
   log("End initializeNow", 5);
 };
+var getCurrentSpeedRanges = function(currentSpeed) {
+  log(`(${currentSpeed})`, 4);
+};
 var setSpeed = function(video, speed) {
+  speed = Number(speed).toFixed(7);
   log("setSpeed started: " + speed, 5);
+  getCurrentSpeedRanges(speed);
   if (tc.settings.forceLastSavedSpeed)
     video.dispatchEvent(new CustomEvent("ratechange", {
       detail: { origin: "videoSpeed", speed }
     }));
-  else
-    video.playbackRate = Number(speed);
-  video.vsc.speedIndicator.textContent = getSpeedDisplay(speed);
+  else {
+    video.playbackRate = speed;
+    log(`not forced ${speed}`);
+  }
+  video.vsc.speedIndicator.textContent = speed;
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -471,11 +491,11 @@ var runAction = function(action, value, e) {
         v.currentTime += value;
       } else if (action === "faster") {
         log("Increase speed", 5);
-        var s = Math.min((v.playbackRate < 0.1 ? 0 : v.playbackRate) + value, 16);
+        const s = Math.min((v.playbackRate < 0.1 ? 0 : v.playbackRate) + value, 16);
         setSpeed(v, s);
       } else if (action === "slower") {
         log("Decrease speed", 5);
-        var s = Math.max(v.playbackRate - value, 0.07);
+        const s = Math.max(v.playbackRate - value, 0.07);
         setSpeed(v, s);
       } else if (action === "reset") {
         log("Reset speed", 5);
