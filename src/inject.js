@@ -15,6 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
+const  speedSet = tcDefaults.speedSets.common
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -146,7 +147,7 @@ function defineVideoController() {
       // override a website's intentional initial speed setting interfering
       // with the site's default behavior)
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
-      setSpeed(event.target, storedSpeed);
+      setSpeed(event.target, storedSpeed, 'explicit');
     };
 
     target.addEventListener(
@@ -655,14 +656,38 @@ function initializeNow(document) {
 
 }
 
-function getCurrentSpeedRanges(currentSpeed) {
-  log(`(${currentSpeed})`, 4);
+function changeSpeed(video, direction='') {
+  const playbackRate = video.playbackRate.toFixed(7)
+  log(`(${playbackRate})`, 4);
+  // for (const [label, value] of Object.entries(object1)) {
+  //   console.log(`${key}: ${value}`);
+  // }
+  let lower = ['reset', 1.0]
+  let upper = ['reset', 1.0]
+      for (const [idx, pair] of speedSet.entries()) {
+        let [n, rate] = pair
+        rate = rate.toFixed(7)
+        log('+'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 4)
+        if (playbackRate === rate) {   
+          log('found at:'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 3)
+          // lower = speedSet[idx]
+          // upper = speedSet[idx+1]
+          if (direction === '-') {
+            setSpeed(video, speedSet[idx-1][1]);
+            break;
+          }
+          if (direction === '+') {
+            setSpeed(video, speedSet[idx+1][1]);
+            break;
+          }
+        } //TODO else if between
+      }
+
 }
 
 function setSpeed(video, speed) {
   speed = Number(speed).toFixed(7);
-  log("setSpeed started: " + speed, 5);
-  getCurrentSpeedRanges(speed)
+  log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(
       new CustomEvent("ratechange", {
@@ -710,20 +735,23 @@ function runAction(action, value, e) {
         log("Increase speed", 5);
         // Maximum playback speed in Chrome is set to 16:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-        const s = Math.min(
-          (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
-          16
-        );
-        setSpeed(v, s);
+        // const s = Math.min(
+        //   (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
+        //   16
+        // );
+        // setSpeed(v, s, '+');
+
+        changeSpeed(v, '+')
       } else if (action === "slower") {
         log("Decrease speed", 5);
-        // Video min rate is 0.0625:
+       // Video min rate is 0.0625:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-        const s = Math.max(v.playbackRate - value, 0.07);
-        setSpeed(v, s);
-      } else if (action === "reset") {
-        log("Reset speed", 5);
-        resetSpeed(v, 1.0);
+        // const s = Math.max(v.playbackRate - value, 0.07);
+        // setSpeed(v, s, '-');
+        changeSpeed(v, '-')
+      // } else if (action === "reset") {
+      //   log("Reset speed", 5);
+      //   resetSpeed(v, 1.0);
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");
@@ -747,8 +775,8 @@ function runAction(action, value, e) {
         }
       } else if (action === "drag") {
         handleDrag(v, e);
-      } else if (action === "fast") {
-        resetSpeed(v, value);
+      // } else if (action === "fast") {
+      //   resetSpeed(v, value);
       } else if (action === "pause") {
         pause(v);
       } else if (action === "muted") {
@@ -773,26 +801,26 @@ function pause(v) {
   }
 }
 
-function resetSpeed(v, target) {
-  if (v.playbackRate === target) {
-    if (v.playbackRate === getKeyBindings("reset")) {
-      if (target !== 1.0) {
-        log("Resetting playback speed to 1.0", 4);
-        setSpeed(v, 1.0);
-      } else {
-        log('Toggling playback speed to "fast" speed', 4);
-        setSpeed(v, getKeyBindings("fast"));
-      }
-    } else {
-      log('Toggling playback speed to "reset" speed', 4);
-      setSpeed(v, getKeyBindings("reset"));
-    }
-  } else {
-    log('Toggling playback speed to "reset" speed', 4);
-    setKeyBindings("reset", v.playbackRate);
-    setSpeed(v, target);
-  }
-}
+// function resetSpeed(v, target) {
+//   if (v.playbackRate === target) {
+//     if (v.playbackRate === getKeyBindings("reset")) {
+//       if (target !== 1.0) {
+//         log("Resetting playback speed to 1.0", 4);
+//         setSpeed(v, 1.0);
+//       } else {
+//         log('Toggling playback speed to "fast" speed', 4);
+//         setSpeed(v, getKeyBindings("fast"));
+//       }
+//     } else {
+//       log('Toggling playback speed to "reset" speed', 4);
+//       setSpeed(v, getKeyBindings("reset"));
+//     }
+//   } else {
+//     log('Toggling playback speed to "reset" speed', 4);
+//     setKeyBindings("reset", v.playbackRate);
+//     setSpeed(v, target);
+//   }
+// }
 
 function muted(v) {
   v.muted = v.muted !== true;

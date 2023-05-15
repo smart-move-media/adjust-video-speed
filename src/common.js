@@ -1,6 +1,6 @@
 export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 export let tcDefaults = {
-  version: "0.8.8",
+  version: "0.8.9",
   lastSpeed: 1.0,
   rememberSpeed: true,
   audioBoolean: false,
@@ -9,20 +9,21 @@ export let tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  // ensure speeds are listed slowest to fastest
   speedSets: {
-    common: {
-      'snail': 0.1,
-      'turtle': 0.25,
-      'half': 0.5,
-      'slower': 0.75,
-      'slow': 0.9,
-      'normal': 1.0,
-      'fast': 1.1,
-      'faster': 1.25,
-      'speedy': 1.5,
-      'double': 2,
-      'blazing': 3,
-    },
+    common: [
+      ['snail', 0.1],
+      ['turtle', 0.25],
+      ['half', 0.5],
+      ['slower', 0.75],
+      ['slow', 0.9],
+      ['normal', 1.0],
+      ['fast', 1.1],
+      ['faster', 1.25],
+      ['speedy', 1.5],
+      ['double', 2],
+      ['blazing', 3],
+    ],
   },
   speedSetChosen: "common",
   keyBindings: [
@@ -31,8 +32,8 @@ export let tcDefaults = {
     { action: "faster", key: 68, value: 0.1, force: false, predefined: true }, // D
     { action: "rewind", key: 90, value: 10, force: false, predefined: true }, // Z
     { action: "advance", key: 88, value: 10, force: false, predefined: true }, // X
-    { action: "reset", key: 82, value: 1, force: false, predefined: true }, // R
-    { action: "fast", key: 71, value: 1.8, force: false, predefined: true } // G
+    // { action: "reset", key: 82, value: 1, force: false, predefined: true }, // R
+    // { action: "fast", key: 71, value: 1.8, force: false, predefined: true } // G
   ],
   blacklist: `www.instagram.com
   twitter.com

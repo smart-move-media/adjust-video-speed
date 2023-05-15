@@ -1,7 +1,7 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var tcDefaults = {
-  version: "0.8.8",
+  version: "0.8.9",
   lastSpeed: 1,
   rememberSpeed: true,
   audioBoolean: false,
@@ -11,19 +11,19 @@ var tcDefaults = {
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
   speedSets: {
-    common: {
-      snail: 0.1,
-      turtle: 0.25,
-      half: 0.5,
-      slower: 0.75,
-      slow: 0.9,
-      normal: 1,
-      fast: 1.1,
-      faster: 1.25,
-      speedy: 1.5,
-      double: 2,
-      blazing: 3
-    }
+    common: [
+      ["snail", 0.1],
+      ["turtle", 0.25],
+      ["half", 0.5],
+      ["slower", 0.75],
+      ["slow", 0.9],
+      ["normal", 1],
+      ["fast", 1.1],
+      ["faster", 1.25],
+      ["speedy", 1.5],
+      ["double", 2],
+      ["blazing", 3]
+    ]
   },
   speedSetChosen: "common",
   keyBindings: [
@@ -31,9 +31,7 @@ var tcDefaults = {
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
     { action: "faster", key: 68, value: 0.1, force: false, predefined: true },
     { action: "rewind", key: 90, value: 10, force: false, predefined: true },
-    { action: "advance", key: 88, value: 10, force: false, predefined: true },
-    { action: "reset", key: 82, value: 1, force: false, predefined: true },
-    { action: "fast", key: 71, value: 1.8, force: false, predefined: true }
+    { action: "advance", key: 88, value: 10, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
   twitter.com
@@ -108,7 +106,7 @@ var defineVideoController = function() {
         storedSpeed = tc.settings.lastSpeed;
       }
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
-      setSpeed(event.target, storedSpeed);
+      setSpeed(event.target, storedSpeed, "explicit");
     };
     target.addEventListener("play", this.handlePlay = mediaEventAction.bind(this));
     target.addEventListener("seeked", this.handleSeek = mediaEventAction.bind(this));
@@ -452,13 +450,31 @@ var initializeNow = function(document2) {
   });
   log("End initializeNow", 5);
 };
-var getCurrentSpeedRanges = function(currentSpeed) {
-  log(`(${currentSpeed})`, 4);
+var changeSpeed = function(video, direction = "") {
+  const playbackRate = video.playbackRate.toFixed(7);
+  log(`(${playbackRate})`, 4);
+  let lower = ["reset", 1];
+  let upper = ["reset", 1];
+  for (const [idx, pair] of speedSet.entries()) {
+    let [n, rate] = pair;
+    rate = rate.toFixed(7);
+    log("+" + idx + "=" + n + "~" + rate + "-" + playbackRate, 4);
+    if (playbackRate === rate) {
+      log("found at:" + idx + "=" + n + "~" + rate + "-" + playbackRate, 3);
+      if (direction === "-") {
+        setSpeed(video, speedSet[idx - 1][1]);
+        break;
+      }
+      if (direction === "+") {
+        setSpeed(video, speedSet[idx + 1][1]);
+        break;
+      }
+    }
+  }
 };
 var setSpeed = function(video, speed) {
   speed = Number(speed).toFixed(7);
-  log("setSpeed started: " + speed, 5);
-  getCurrentSpeedRanges(speed);
+  log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed)
     video.dispatchEvent(new CustomEvent("ratechange", {
       detail: { origin: "videoSpeed", speed }
@@ -491,15 +507,10 @@ var runAction = function(action, value, e) {
         v.currentTime += value;
       } else if (action === "faster") {
         log("Increase speed", 5);
-        const s = Math.min((v.playbackRate < 0.1 ? 0 : v.playbackRate) + value, 16);
-        setSpeed(v, s);
+        changeSpeed(v, "+");
       } else if (action === "slower") {
         log("Decrease speed", 5);
-        const s = Math.max(v.playbackRate - value, 0.07);
-        setSpeed(v, s);
-      } else if (action === "reset") {
-        log("Reset speed", 5);
-        resetSpeed(v, 1);
+        changeSpeed(v, "-");
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");
@@ -516,8 +527,6 @@ var runAction = function(action, value, e) {
         }
       } else if (action === "drag")
         handleDrag(v, e);
-      else if (action === "fast")
-        resetSpeed(v, value);
       else if (action === "pause")
         pause(v);
       else if (action === "muted")
@@ -537,26 +546,6 @@ var pause = function(v) {
   } else {
     log("Pausing video", 5);
     v.pause();
-  }
-};
-var resetSpeed = function(v, target) {
-  if (v.playbackRate === target)
-    if (v.playbackRate === getKeyBindings("reset"))
-      if (target !== 1) {
-        log("Resetting playback speed to 1.0", 4);
-        setSpeed(v, 1);
-      } else {
-        log('Toggling playback speed to "fast" speed', 4);
-        setSpeed(v, getKeyBindings("fast"));
-      }
-    else {
-      log('Toggling playback speed to "reset" speed', 4);
-      setSpeed(v, getKeyBindings("reset"));
-    }
-  else {
-    log('Toggling playback speed to "reset" speed', 4);
-    setKeyBindings("reset", v.playbackRate);
-    setSpeed(v, target);
   }
 };
 var muted = function(v) {
@@ -623,6 +612,7 @@ var tc = {
   },
   mediaElements: []
 };
+var speedSet = tcDefaults.speedSets.common;
 for (let field of SettingFieldsSynced)
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
