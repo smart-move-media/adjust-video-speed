@@ -670,8 +670,6 @@ function changeSpeed(video, direction='') {
         log('+'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 4)
         if (playbackRate === rate) {   
           log('found at:'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 3)
-          // lower = speedSet[idx]
-          // upper = speedSet[idx+1]
           if (direction === '-') {
             setSpeed(video, speedSet[idx-1][1]);
             break;
