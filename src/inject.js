@@ -15,7 +15,9 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-const  speedSet = tcDefaults.speedSets.common
+const speedSet = tcDefaults.speedSets.common
+const speedNames = Object.keys(speedSet)
+const speedValues = Object.values(speedSet)
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -662,25 +664,33 @@ function changeSpeed(video, direction='') {
   // for (const [label, value] of Object.entries(object1)) {
   //   console.log(`${key}: ${value}`);
   // }
-  let lower = ['reset', 1.0]
-  let upper = ['reset', 1.0]
-      for (const [idx, pair] of speedSet.entries()) {
-        let [n, rate] = pair
-        rate = rate.toFixed(7)
-        log('+'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 4)
-        if (playbackRate === rate) {   
-          log('found at:'+ idx +'='+ n+'~'+ rate +'-'+ playbackRate, 3)
-          if (direction === '-') {
-            setSpeed(video, speedSet[idx-1][1]);
-            break;
-          }
-          if (direction === '+') {
-            setSpeed(video, speedSet[idx+1][1]);
-            break;
-          }
-        } //TODO else if between
-      }
+  // for (const [idx, pair] of speedSet.entries()) {
+  //   let [n, rate] = pair
+  //   rate = rate.toFixed(7)
+  //   log('+'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 4)
+  //   if (playbackRate === rate) {   
+  //     log('found at:'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 3)
+  //     if (direction === '-') {
+  //       setSpeed(video, speedSet[idx-1][1]);
+  //       break;
+  //     }
+  //     if (direction === '+') {
+  //       setSpeed(video, speedSet[idx+1][1]);
+  //       break;
+  //     }
+  //   } //TODO else if between
+  // }
 
+  const isEqualRates = (r) => r.toFixed(7) === playbackRate
+  let idx = speedValues.findIndex(isEqualRates)
+  log('found at:'+ idx +'='+ speedNames[idx] +'~'+ speedValues[idx] +'-'+ playbackRate, 3)
+  if (direction === '-') {
+    idx -= 1
+  } else
+  if (direction === '+') {
+    idx += 1
+  }
+  setSpeed(video, speedValues[idx].toFixed(7))
 }
 
 function setSpeed(video, speed) {

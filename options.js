@@ -11,19 +11,19 @@ var tcDefaults = {
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
   speedSets: {
-    common: [
-      ["snail", 0.1],
-      ["turtle", 0.25],
-      ["half", 0.5],
-      ["slower", 0.75],
-      ["slow", 0.9],
-      ["normal", 1],
-      ["fast", 1.1],
-      ["faster", 1.25],
-      ["speedy", 1.5],
-      ["double", 2],
-      ["blazing", 3]
-    ]
+    common: {
+      snail: 0.1,
+      turtle: 0.25,
+      half: 0.5,
+      slower: 0.75,
+      slow: 0.9,
+      normal: 1,
+      fast: 1.1,
+      faster: 1.25,
+      speedy: 1.5,
+      double: 2,
+      blazing: 3
+    }
   },
   speedSetChosen: "common",
   keyBindings: [

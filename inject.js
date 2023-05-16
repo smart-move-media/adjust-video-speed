@@ -11,19 +11,19 @@ var tcDefaults = {
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
   speedSets: {
-    common: [
-      ["snail", 0.1],
-      ["turtle", 0.25],
-      ["half", 0.5],
-      ["slower", 0.75],
-      ["slow", 0.9],
-      ["normal", 1],
-      ["fast", 1.1],
-      ["faster", 1.25],
-      ["speedy", 1.5],
-      ["double", 2],
-      ["blazing", 3]
-    ]
+    common: {
+      snail: 0.1,
+      turtle: 0.25,
+      half: 0.5,
+      slower: 0.75,
+      slow: 0.9,
+      normal: 1,
+      fast: 1.1,
+      faster: 1.25,
+      speedy: 1.5,
+      double: 2,
+      blazing: 3
+    }
   },
   speedSetChosen: "common",
   keyBindings: [
@@ -453,24 +453,16 @@ var initializeNow = function(document2) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  let lower = ["reset", 1];
-  let upper = ["reset", 1];
-  for (const [idx, pair] of speedSet.entries()) {
-    let [n, rate] = pair;
-    rate = rate.toFixed(7);
-    log("+" + idx + "=" + n + "~" + rate + "-" + playbackRate, 4);
-    if (playbackRate === rate) {
-      log("found at:" + idx + "=" + n + "~" + rate + "-" + playbackRate, 3);
-      if (direction === "-") {
-        setSpeed(video, speedSet[idx - 1][1]);
-        break;
-      }
-      if (direction === "+") {
-        setSpeed(video, speedSet[idx + 1][1]);
-        break;
-      }
-    }
-  }
+  log(speedValues, 2);
+  log(speedNames, 2);
+  const isEqualRates = (r) => r.toFixed(7) === playbackRate;
+  let idx = speedValues.findIndex(isEqualRates);
+  log("found at:" + idx + "=" + speedNames[idx] + "~" + speedValues[idx] + "-" + playbackRate, 3);
+  if (direction === "-")
+    idx -= 1;
+  else if (direction === "+")
+    idx += 1;
+  setSpeed(video, speedValues[idx].toFixed(7));
 };
 var setSpeed = function(video, speed) {
   speed = Number(speed).toFixed(7);
@@ -613,6 +605,8 @@ var tc = {
   mediaElements: []
 };
 var speedSet = tcDefaults.speedSets.common;
+var speedNames = Object.keys(speedSet);
+var speedValues = Object.values(speedSet);
 for (let field of SettingFieldsSynced)
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
