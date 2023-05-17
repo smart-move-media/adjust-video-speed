@@ -681,14 +681,27 @@ function changeSpeed(video, direction='') {
   //   } //TODO else if between
   // }
 
-  const isEqualRates = (r) => r.toFixed(7) === playbackRate
-  let idx = speedValues.findIndex(isEqualRates)
-  log('found at:'+ idx +'='+ speedNames[idx] +'~'+ speedValues[idx] +'-'+ playbackRate, 3)
-  if (direction === '-') {
-    idx -= 1
-  } else
-  if (direction === '+') {
-    idx += 1
+  const isEqualRate = (r) => r.toFixed(7) === playbackRate
+  let idx = speedValues.findIndex(isEqualRate)
+  log('at:'+ idx +'='+ speedNames[idx] +'~'+ speedValues[idx] +'-'+ playbackRate, 3)
+  if (idx > -1) { // found?
+    log('found')
+    if (direction === '-') {
+      idx -= 1
+    } else
+    if (direction === '+') {
+      idx += 1
+    }
+  } else {
+    log('not =')
+    const isGreaterRate = (r) => r.toFixed(7) > playbackRate
+    idx = speedValues.findIndex(isGreaterRate)
+    if (direction === '-') {
+      idx -= 1
+    }// else use idx as-is
+    // if (direction === '+') {
+    //   idx
+    // }
   }
   setSpeed(video, speedValues[idx].toFixed(7))
 }

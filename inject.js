@@ -453,15 +453,22 @@ var initializeNow = function(document2) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  log(speedValues, 2);
-  log(speedNames, 2);
-  const isEqualRates = (r) => r.toFixed(7) === playbackRate;
-  let idx = speedValues.findIndex(isEqualRates);
-  log("found at:" + idx + "=" + speedNames[idx] + "~" + speedValues[idx] + "-" + playbackRate, 3);
-  if (direction === "-")
-    idx -= 1;
-  else if (direction === "+")
-    idx += 1;
+  const isEqualRate = (r) => r.toFixed(7) === playbackRate;
+  let idx = speedValues.findIndex(isEqualRate);
+  log("at:" + idx + "=" + speedNames[idx] + "~" + speedValues[idx] + "-" + playbackRate, 3);
+  if (idx > -1) {
+    log("found");
+    if (direction === "-")
+      idx -= 1;
+    else if (direction === "+")
+      idx += 1;
+  } else {
+    log("not =");
+    const isGreaterRate = (r) => r.toFixed(7) > playbackRate;
+    idx = speedValues.findIndex(isGreaterRate);
+    if (direction === "-")
+      idx -= 1;
+  }
   setSpeed(video, speedValues[idx].toFixed(7));
 };
 var setSpeed = function(video, speed) {
