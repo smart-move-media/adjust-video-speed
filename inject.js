@@ -11,21 +11,49 @@ var tcDefaults = {
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
   speedSets: {
-    common: {
-      snail: 0.1,
-      turtle: 0.25,
-      half: 0.5,
-      slower: 0.75,
-      slow: 0.9,
-      normal: 1,
-      fast: 1.1,
-      faster: 1.25,
-      speedy: 1.5,
-      double: 2,
-      blazing: 3
-    }
+    common: [
+      ["snail", 0.1],
+      ["turtle", 0.25],
+      ["half", 0.5],
+      ["slower", 0.75],
+      ["slow", 0.9],
+      ["normal", 1],
+      ["fast", 1.1],
+      ["faster", 1.25],
+      ["speedy", 1.5],
+      ["double", 2],
+      ["blazing", 3]
+    ],
+    pitch440: [
+      [-24, 0.25],
+      [-12, 0.5],
+      [-11, 0.5297315],
+      [-10, 0.561231],
+      [-9, 0.5946036],
+      [-8, 0.6299605],
+      [-7, 0.6674199],
+      [-6, 0.7071068],
+      [-5, 0.7491535],
+      [-4, 0.7937005],
+      [-3, 0.8408964],
+      [-2, 0.8908987],
+      [-1, 0.9438743],
+      [0, 1],
+      [1, 1.0594631],
+      [2, 1.122462],
+      [3, 1.1892071],
+      [4, 1.259921],
+      [5, 1.3348399],
+      [6, 1.4142136],
+      [7, 1.4983071],
+      [8, 1.5874011],
+      [9, 1.6817928],
+      [10, 1.7817974],
+      [11, 1.8877486],
+      [12, 2]
+    ]
   },
-  speedSetChosen: "common",
+  speedSetChosen: "pitch440",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -477,25 +505,31 @@ var initializeNow = function(document2) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  const isEqualRate = (r) => r.toFixed(7) === playbackRate;
-  let idx = speedValues.findIndex(isEqualRate);
-  log("at:" + idx + "=" + speedNames[idx] + "~" + speedValues[idx] + "-" + playbackRate, 3);
-  if (idx > -1) {
-    log("found");
-    if (direction === "-") {
-      idx -= 1;
-    } else if (direction === "+") {
-      idx += 1;
-    }
-  } else {
-    log("not =");
-    const isGreaterRate = (r) => r.toFixed(7) > playbackRate;
-    idx = speedValues.findIndex(isGreaterRate);
-    if (direction === "-") {
-      idx -= 1;
+  for (const [idx, pair] of speedSet.entries()) {
+    let [n, rate] = pair;
+    rate = rate.toFixed(7);
+    log("+" + idx + "=" + n + "~" + rate + "-" + playbackRate, 4);
+    if (playbackRate === rate) {
+      log("found at:" + idx + "=" + n + "~" + rate + "-" + playbackRate, 3);
+      if (direction === "-") {
+        setSpeed(video, speedSet[idx - 1][1]);
+        break;
+      }
+      if (direction === "+") {
+        setSpeed(video, speedSet[idx + 1][1]);
+        break;
+      }
+    } else if (playbackRate < rate) {
+      if (direction === "-") {
+        setSpeed(video, speedSet[idx - 1][1]);
+        break;
+      }
+      if (direction === "+") {
+        setSpeed(video, speedSet[idx][1]);
+        break;
+      }
     }
   }
-  setSpeed(video, speedValues[idx].toFixed(7));
 };
 var setSpeed = function(video, speed) {
   speed = Number(speed).toFixed(7);
@@ -642,9 +676,7 @@ var tc = {
   },
   mediaElements: []
 };
-var speedSet = tcDefaults.speedSets.common;
-var speedNames = Object.keys(speedSet);
-var speedValues = Object.values(speedSet);
+var speedSet = tcDefaults.speedSets[tcDefaults.speedSetChosen];
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);

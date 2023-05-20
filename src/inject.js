@@ -15,9 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-const speedSet = tcDefaults.speedSets.common
-const speedNames = Object.keys(speedSet)
-const speedValues = Object.values(speedSet)
+const speedSet = tcDefaults.speedSets[tcDefaults.speedSetChosen]
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -660,50 +658,32 @@ function initializeNow(document) {
 
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
-  log(`(${playbackRate})`, 4);
-  // for (const [label, value] of Object.entries(object1)) {
-  //   console.log(`${key}: ${value}`);
-  // }
-  // for (const [idx, pair] of speedSet.entries()) {
-  //   let [n, rate] = pair
-  //   rate = rate.toFixed(7)
-  //   log('+'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 4)
-  //   if (playbackRate === rate) {   
-  //     log('found at:'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 3)
-  //     if (direction === '-') {
-  //       setSpeed(video, speedSet[idx-1][1]);
-  //       break;
-  //     }
-  //     if (direction === '+') {
-  //       setSpeed(video, speedSet[idx+1][1]);
-  //       break;
-  //     }
-  //   } //TODO else if between
-  // }
-
-  const isEqualRate = (r) => r.toFixed(7) === playbackRate
-  let idx = speedValues.findIndex(isEqualRate)
-  log('at:'+ idx +'='+ speedNames[idx] +'~'+ speedValues[idx] +'-'+ playbackRate, 3)
-  if (idx > -1) { // found?
-    log('found')
-    if (direction === '-') {
-      idx -= 1
-    } else
-    if (direction === '+') {
-      idx += 1
+  log(`(${playbackRate})`, 4)
+  for (const [idx, pair] of speedSet.entries()) {
+    let [n, rate] = pair
+    rate = rate.toFixed(7)
+    log('+'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 4)
+    if (playbackRate === rate) {   
+      log('found at:'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 3)
+      if (direction === '-') {
+        setSpeed(video, speedSet[idx-1][1]);
+        break;
+      }
+      if (direction === '+') {
+        setSpeed(video, speedSet[idx+1][1]);
+        break;
+      }
+    } else if (playbackRate < rate) {
+      if (direction === '-') {
+        setSpeed(video, speedSet[idx-1][1]);
+        break;
+      }
+      if (direction === '+') {
+        setSpeed(video, speedSet[idx][1]);
+        break;
+      }
     }
-  } else {
-    log('not =')
-    const isGreaterRate = (r) => r.toFixed(7) > playbackRate
-    idx = speedValues.findIndex(isGreaterRate)
-    if (direction === '-') {
-      idx -= 1
-    }// else use idx as-is
-    // if (direction === '+') {
-    //   idx
-    // }
   }
-  setSpeed(video, speedValues[idx].toFixed(7))
 }
 
 function setSpeed(video, speed) {
@@ -914,3 +894,4 @@ function showController(controller) {
     log("Hiding controller", 5);
   }, 2000);
 }
+
