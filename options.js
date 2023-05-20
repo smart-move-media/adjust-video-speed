@@ -50,9 +50,9 @@ var recordKeyPress = function(e) {
     e.target.keyCode = e.keyCode;
     e.preventDefault();
     e.stopPropagation();
-  } else if (e.keyCode === 8)
+  } else if (e.keyCode === 8) {
     e.target.value = "";
-  else if (e.keyCode === 27) {
+  } else if (e.keyCode === 27) {
     e.target.value = "null";
     e.target.keyCode = null;
   }
@@ -148,8 +148,9 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("saveRaw").addEventListener("click", save_raw_options);
   document.getElementById("restore").addEventListener("click", restore_json);
   function eventCaller(event, className, funcName) {
-    if (!event.target.classList.contains(className))
+    if (!event.target.classList.contains(className)) {
       return;
+    }
     funcName(event);
   }
   document.addEventListener("keypress", (event) => {
@@ -174,8 +175,9 @@ document.addEventListener("DOMContentLoaded", function() {
       if (customActionsNoValues.includes(event.target.value)) {
         event.target.nextElementSibling.nextElementSibling.disabled = true;
         event.target.nextElementSibling.nextElementSibling.value = 0;
-      } else
+      } else {
         event.target.nextElementSibling.nextElementSibling.disabled = false;
+      }
     });
   });
 });

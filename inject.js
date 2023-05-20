@@ -47,15 +47,15 @@ var tcDefaults = {
 var log = function(message, level = 4) {
   if (tc.settings.logLevel >= level) {
     message = `${log.caller?.name ?? "unknown"}: ${message}`;
-    if (level === 2)
+    if (level === 2) {
       console.log("ERROR:" + message);
-    else if (level === 3)
+    } else if (level === 3) {
       console.log("WARNING:" + message);
-    else if (level === 4)
+    } else if (level === 4) {
       console.log("INFO:" + message);
-    else if (level === 5)
+    } else if (level === 5) {
       console.log("DEBUG:" + message);
-    else if (level === 6) {
+    } else if (level === 6) {
       console.log("DEBUG (VERBOSE):" + message);
       console.trace();
     }
@@ -73,8 +73,9 @@ var setKeyBindings = function(action, value) {
 };
 var defineVideoController = function() {
   tc.videoController = function(target, parent) {
-    if (target.vsc)
+    if (target.vsc) {
       return target.vsc;
+    }
     tc.mediaElements.push(target);
     this.video = target;
     this.parent = target.parentElement || parent;
@@ -115,10 +116,11 @@ var defineVideoController = function() {
         if (mutation.type === "attributes" && (mutation.attributeName === "src" || mutation.attributeName === "currentSrc")) {
           log("mutation of A/V element", 5);
           var controller = this.div;
-          if (!mutation.target.src && !mutation.target.currentSrc)
+          if (!mutation.target.src && !mutation.target.currentSrc) {
             controller.classList.add("vsc-nosource");
-          else
+          } else {
             controller.classList.remove("vsc-nosource");
+          }
         }
       });
     });
@@ -132,8 +134,9 @@ var defineVideoController = function() {
     this.video.removeEventListener("seek", this.handleSeek);
     delete this.video.vsc;
     let idx = tc.mediaElements.indexOf(this.video);
-    if (idx != -1)
+    if (idx != -1) {
       tc.mediaElements.splice(idx, 1);
+    }
   };
   tc.videoController.prototype.initializeControls = function() {
     log("initializeControls Begin", 5);
@@ -146,10 +149,12 @@ var defineVideoController = function() {
     log("initializeControls: Speed set to: " + speed, 5);
     var wrapper = document2.createElement("div");
     wrapper.classList.add("vsc-controller");
-    if (!this.video.currentSrc)
+    if (!this.video.currentSrc) {
       wrapper.classList.add("vsc-nosource");
-    if (tc.settings.startHidden)
+    }
+    if (tc.settings.startHidden) {
       wrapper.classList.add("vsc-hidden");
+    }
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = `
         <style>
@@ -210,9 +215,10 @@ var isBlacklisted = function() {
   blacklisted = false;
   tc.settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
-    if (match.length == 0)
+    if (match.length == 0) {
       return;
-    if (match.startsWith("/"))
+    }
+    if (match.startsWith("/")) {
       try {
         var parts = match.split("/");
         if (regEndsWithFlags.test(match)) {
@@ -226,8 +232,9 @@ var isBlacklisted = function() {
       } catch (err) {
         return;
       }
-    else
+    } else {
       var regexp = new RegExp(escapeStringRegExp(match));
+    }
     if (regexp.test(location.href)) {
       blacklisted = true;
       return;
@@ -237,8 +244,9 @@ var isBlacklisted = function() {
 };
 var refreshCoolDown = function() {
   log("Begin refreshCoolDown", 5);
-  if (coolDown)
+  if (coolDown) {
     clearTimeout(coolDown);
+  }
   coolDown = setTimeout(function() {
     coolDown = false;
   }, 1000);
@@ -277,28 +285,34 @@ var setupListener = function() {
       if (event.detail && event.detail.origin === "videoSpeed") {
         video.playbackRate = event.detail.speed;
         updateSpeedFromEvent(video, event);
-      } else
+      } else {
         video.playbackRate = tc.settings.lastSpeed;
+      }
       event.stopImmediatePropagation();
-    } else
+    } else {
       updateSpeedFromEvent(video, event);
+    }
   }, true);
 };
 var initializeWhenReady = function(document2) {
   log("Begin initializeWhenReady", 5);
-  if (isBlacklisted())
+  if (isBlacklisted()) {
     return;
+  }
   window.onload = () => {
     initializeNow(window.document);
   };
-  if (document2)
-    if (document2.readyState === "complete")
+  if (document2) {
+    if (document2.readyState === "complete") {
       initializeNow(document2);
-    else
+    } else {
       document2.onreadystatechange = () => {
-        if (document2.readyState === "complete")
+        if (document2.readyState === "complete") {
           initializeNow(document2);
+        }
       };
+    }
+  }
   log("End initializeWhenReady", 5);
 };
 var inIframe = function() {
@@ -316,8 +330,9 @@ var getShadow = function(parent) {
       do {
         result.push(child);
         getChild(child);
-        if (child.shadowRoot)
+        if (child.shadowRoot) {
           result.push(getShadow(child.shadowRoot));
+        }
         child = child.nextElementSibling;
       } while (child);
     }
@@ -329,17 +344,18 @@ var initializeNow = function(document2) {
   log("Begin initializeNow", 5);
   if (!tc.settings.enabled)
     return;
-  if (!document2.body || document2.body.classList.contains("vsc-initialized"))
+  if (!document2.body || document2.body.classList.contains("vsc-initialized")) {
     return;
+  }
   try {
     setupListener();
   } catch {
   }
   document2.body.classList.add("vsc-initialized");
   log("initializeNow: vsc-initialized added to document body", 5);
-  if (document2 === window.document)
+  if (document2 === window.document) {
     defineVideoController();
-  else {
+  } else {
     var link = document2.createElement("link");
     link.href = chrome.runtime.getURL("inject.css");
     link.type = "text/css";
@@ -360,10 +376,12 @@ var initializeNow = function(document2) {
         log("Keydown event ignored due to active modifier: " + keyCode, 5);
         return;
       }
-      if (event.target.nodeName === "INPUT" || event.target.nodeName === "TEXTAREA" || event.target.isContentEditable)
+      if (event.target.nodeName === "INPUT" || event.target.nodeName === "TEXTAREA" || event.target.isContentEditable) {
         return false;
-      if (!tc.mediaElements.length)
+      }
+      if (!tc.mediaElements.length) {
         return false;
+      }
       var item = tc.settings.keyBindings.find((item2) => item2.key === keyCode);
       if (item) {
         runAction(item.action, item.value);
@@ -376,18 +394,23 @@ var initializeNow = function(document2) {
     }, true);
   });
   function checkForVideo(node, parent, added) {
-    if (!added && document2.body.contains(node))
+    if (!added && document2.body.contains(node)) {
       return;
+    }
     if (node.nodeName === "VIDEO" || node.nodeName === "AUDIO" && tc.settings.audioBoolean) {
-      if (added)
+      if (added) {
         node.vsc = new tc.videoController(node, parent);
-      else if (node.vsc)
-        node.vsc.remove();
-    } else if (node.children != null)
+      } else {
+        if (node.vsc) {
+          node.vsc.remove();
+        }
+      }
+    } else if (node.children != null) {
       for (var i = 0;i < node.children.length; i++) {
         const child = node.children[i];
         checkForVideo(child, child.parentNode || parent, added);
       }
+    }
   }
   var observer = new MutationObserver(function(mutations) {
     requestIdleCallback((_) => {
@@ -432,10 +455,11 @@ var initializeNow = function(document2) {
     childList: true,
     subtree: true
   });
-  if (tc.settings.audioBoolean)
+  if (tc.settings.audioBoolean) {
     var mediaTags = document2.querySelectorAll("video,audio");
-  else
+  } else {
     var mediaTags = document2.querySelectorAll("video");
+  }
   mediaTags.forEach(function(video) {
     video.vsc = new tc.videoController(video);
   });
@@ -458,27 +482,29 @@ var changeSpeed = function(video, direction = "") {
   log("at:" + idx + "=" + speedNames[idx] + "~" + speedValues[idx] + "-" + playbackRate, 3);
   if (idx > -1) {
     log("found");
-    if (direction === "-")
+    if (direction === "-") {
       idx -= 1;
-    else if (direction === "+")
+    } else if (direction === "+") {
       idx += 1;
+    }
   } else {
     log("not =");
     const isGreaterRate = (r) => r.toFixed(7) > playbackRate;
     idx = speedValues.findIndex(isGreaterRate);
-    if (direction === "-")
+    if (direction === "-") {
       idx -= 1;
+    }
   }
   setSpeed(video, speedValues[idx].toFixed(7));
 };
 var setSpeed = function(video, speed) {
   speed = Number(speed).toFixed(7);
   log(" started: " + speed, 5);
-  if (tc.settings.forceLastSavedSpeed)
+  if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(new CustomEvent("ratechange", {
       detail: { origin: "videoSpeed", speed }
     }));
-  else {
+  } else {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
@@ -490,12 +516,14 @@ var setSpeed = function(video, speed) {
 var runAction = function(action, value, e) {
   log("runAction Begin", 5);
   var mediaTags = tc.mediaElements;
-  if (e)
+  if (e) {
     var targetController = e.target.getRootNode().host;
+  }
   mediaTags.forEach(function(v) {
     var controller = v.vsc.div;
-    if (e && !(targetController == controller))
+    if (e && !(targetController == controller)) {
       return;
+    }
     showController(controller);
     if (!v.classList.contains("vsc-cancelled")) {
       if (action === "rewind") {
@@ -524,16 +552,17 @@ var runAction = function(action, value, e) {
             controller.blinkTimeOut = undefined;
           }, value ? value : 1000);
         }
-      } else if (action === "drag")
+      } else if (action === "drag") {
         handleDrag(v, e);
-      else if (action === "pause")
+      } else if (action === "pause") {
         pause(v);
-      else if (action === "muted")
+      } else if (action === "muted") {
         muted(v);
-      else if (action === "mark")
+      } else if (action === "mark") {
         setMark(v);
-      else if (action === "jump")
+      } else if (action === "jump") {
         jumpToMark(v);
+      }
     }
   });
   log("runAction End", 5);
@@ -556,15 +585,17 @@ var setMark = function(v) {
 };
 var jumpToMark = function(v) {
   log("Recalling marker", 5);
-  if (v.vsc.mark && typeof v.vsc.mark === "number")
+  if (v.vsc.mark && typeof v.vsc.mark === "number") {
     v.currentTime = v.vsc.mark;
+  }
 };
 var handleDrag = function(video, e) {
   const controller = video.vsc.div;
   const shadowController = controller.shadowRoot.querySelector("#controller");
   var parentElement = controller.parentElement;
-  while (parentElement.parentNode && parentElement.parentNode.offsetHeight === parentElement.offsetHeight && parentElement.parentNode.offsetWidth === parentElement.offsetWidth)
+  while (parentElement.parentNode && parentElement.parentNode.offsetHeight === parentElement.offsetHeight && parentElement.parentNode.offsetWidth === parentElement.offsetWidth) {
     parentElement = parentElement.parentNode;
+  }
   video.classList.add("vcs-dragging");
   shadowController.classList.add("dragging");
   const initialMouseXY = [e.clientX, e.clientY];
@@ -614,9 +645,10 @@ var tc = {
 var speedSet = tcDefaults.speedSets.common;
 var speedNames = Object.keys(speedSet);
 var speedValues = Object.values(speedSet);
-for (let field of SettingFieldsSynced)
+for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
+}
 chrome.storage.sync.get(tc.settings, function(storage) {
   tc.settings.keyBindings = storage.keyBindings;
   if (storage.keyBindings.length == 0) {
