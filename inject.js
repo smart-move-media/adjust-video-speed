@@ -51,9 +51,37 @@ var tcDefaults = {
       [10, 1.7817974],
       [11, 1.8877486],
       [12, 2]
+    ],
+    pitch432: [
+      [-24, 0.2454545],
+      [-12, 0.4909091],
+      [-11, 0.5201001],
+      [-10, 0.5510268],
+      [-9, 0.5837926],
+      [-8, 0.6185067],
+      [-7, 0.655285],
+      [-6, 0.6942503],
+      [-5, 0.7355326],
+      [-4, 0.7792696],
+      [-3, 0.8256074],
+      [-2, 0.8747006],
+      [-1, 0.926713],
+      [0, 0.9818182],
+      [1, 1.0402001],
+      [2, 1.1020536],
+      [3, 1.1675852],
+      [4, 1.2370134],
+      [5, 1.31057],
+      [6, 1.3885006],
+      [7, 1.4710651],
+      [8, 1.5585392],
+      [9, 1.6512148],
+      [10, 1.7494011],
+      [11, 1.8534259],
+      [12, 1.9636364]
     ]
   },
-  speedSetChosen: "pitch440",
+  speedSetChosen: "pitch432",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -172,8 +200,8 @@ var defineVideoController = function() {
     const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
-    const top = Math.max(rect.top - (offsetRect?.top || 0), 0) + "px";
-    const left = Math.max(rect.left - (offsetRect?.left || 0), 0) + "px";
+    const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
+    const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
     log("initializeControls: Speed set to: " + speed, 5);
     var wrapper = document2.createElement("div");
     wrapper.classList.add("vsc-controller");

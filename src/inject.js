@@ -202,8 +202,8 @@ function defineVideoController() {
     // are relative to offsetParent, so we adjust for that here. offsetParent
     // can be null if the video has `display: none` or is not yet in the DOM.
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
-    const top = Math.max(rect.top - (offsetRect?.top || 0), 0) + "px";
-    const left = Math.max(rect.left - (offsetRect?.left || 0), 0) + "px";
+    const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
+    const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
 
     log("initializeControls: Speed set to: " + speed, 5);
 

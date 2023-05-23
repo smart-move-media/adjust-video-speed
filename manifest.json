@@ -1,11 +1,11 @@
 {
   "name": "Adjust Video Speed",
   "short_name": "adjustvideospeed",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "manifest_version": 3,
   "minimum_chrome_version": "89",
   "description": "Change audio/video playback speeds with shortcuts",
-  "homepage_url": "https://github.com/igrigorik/videospeed",
+  "homepage_url": "https://github.com/smart-move-media/adjust-video-speed",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

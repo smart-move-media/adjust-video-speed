@@ -121,7 +121,7 @@ function notify(msg) {
 
 function save_raw_options() {
   const rawJ = JSON.parse( document.getElementById("rawJson").value);
-  // restore_from_settingsObj(rawJ);
+  restore_from_settingsObj(rawJ);
   chrome.storage.sync.set(rawJ,()=>notify("Raw Options saved"));
 }
 

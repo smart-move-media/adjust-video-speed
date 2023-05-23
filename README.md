@@ -1,5 +1,7 @@
 # Adjust Video Speed
 
+### WARNING: fork under construction 2023-05
+
 HTML5 video provides a native API to accelerate playback of any video. The
 problem is many players either hide or limit this functionality. For the best
 results, playback speed adjustments should be easy and frequent to match the pace
