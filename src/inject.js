@@ -15,7 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-const speedSet = tcDefaults.speedSets[tcDefaults.speedSetChosen]
+let speedSet = []
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -105,6 +105,7 @@ function formatSpeedIndicator(speed) {
 }
 
 function defineVideoController() {
+  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   // Data structures
   // ---------------
   // videoController (JS object) instances:

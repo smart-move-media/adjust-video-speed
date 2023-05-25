@@ -140,6 +140,7 @@ var formatSpeedIndicator = function(speed) {
   });
 };
 var defineVideoController = function() {
+  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
   tc.videoController = function(target, parent) {
     if (target.vsc) {
       return target.vsc;
@@ -712,7 +713,7 @@ var tc = {
   },
   mediaElements: []
 };
-var speedSet = tcDefaults.speedSets[tcDefaults.speedSetChosen];
+var speedSet = [];
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
