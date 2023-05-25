@@ -1,11 +1,11 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var tcDefaults = {
-  version: "0.8.9",
+  version: "0.8.10",
   lastSpeed: 1,
   rememberSpeed: true,
   audioBoolean: false,
-  controllerOpacity: 0.38,
+  controllerOpacity: 0.6,
   enabled: true,
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
@@ -81,7 +81,7 @@ var tcDefaults = {
       [12, 1.9636364]
     ]
   },
-  speedSetChosen: "pitch432",
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
@@ -126,6 +126,18 @@ var getKeyBindings = function(action, what = "value") {
 };
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
+};
+var formatSpeedIndicator = function(speed) {
+  let percent = speed * 100;
+  return injectTemplate({
+    name: speedSet[0][0],
+    percent: percent.toFixed(0) + "%",
+    percent1: percent.toFixed(1) + "%",
+    percent2: percent.toFixed(2) + "%",
+    speed,
+    speed2: Number(speed).toFixed(2),
+    speed3: Number(speed).toFixed(3)
+  });
 };
 var defineVideoController = function() {
   tc.videoController = function(target, parent) {
@@ -195,22 +207,18 @@ var defineVideoController = function() {
     }
   };
   tc.videoController.prototype.initializeControls = function() {
-    log("initializeControls Begin", 5);
+    log("Begin", 5);
     const document2 = this.video.ownerDocument;
-    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
-    log("initializeControls: Speed set to: " + speed, 5);
     var wrapper = document2.createElement("div");
     wrapper.classList.add("vsc-controller");
-    if (!this.video.currentSrc) {
+    if (!this.video.currentSrc)
       wrapper.classList.add("vsc-nosource");
-    }
-    if (tc.settings.startHidden) {
+    if (tc.settings.startHidden)
       wrapper.classList.add("vsc-hidden");
-    }
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = `
         <style>
@@ -218,7 +226,7 @@ var defineVideoController = function() {
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">${speed}</span>
+          <span data-action="drag" class="draggable">--</span>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -317,7 +325,7 @@ var setupListener = function() {
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = speed;
+    video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed);
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -570,7 +578,7 @@ var setSpeed = function(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
-  video.vsc.speedIndicator.textContent = speed;
+  video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -742,5 +750,7 @@ chrome.storage.sync.get(tc.settings, function(storage) {
   }
   initializeWhenReady(document);
 });
+var strTemplate = "${name} : ${speed3}";
+var injectTemplate = (obj) => strTemplate.replace(/\${(.*?)}/g, (x, g) => obj[g]);
 var coolDown = false;
 var timer = null;

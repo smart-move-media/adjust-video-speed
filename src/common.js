@@ -4,7 +4,7 @@ export let tcDefaults = {
   lastSpeed: 1.0,
   rememberSpeed: true,
   audioBoolean: false,
-  controllerOpacity: 0.38,
+  controllerOpacity: 0.6,
   enabled: true,
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
@@ -81,7 +81,7 @@ export let tcDefaults = {
       [+12, 1.9636364],
     ],
   },
-  speedSetChosen: "pitch432",
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true }, // V
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true }, // S

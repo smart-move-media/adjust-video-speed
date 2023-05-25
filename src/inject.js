@@ -88,6 +88,21 @@ function setKeyBindings(action, value) {
     "value"
   ] = value;
 }
+let strTemplate = '${name} : ${speed3}'
+let injectTemplate =(obj)=> strTemplate.replace(/\${(.*?)}/g, (x,g)=> obj[g])
+function formatSpeedIndicator(speed) {
+  let percent = (speed * 100)
+  return injectTemplate({
+    name: speedSet[0][0],
+    percent: percent.toFixed(0) +'%',
+    percent1: percent.toFixed(1) +'%',
+    percent2: percent.toFixed(2) +'%',
+    speed: speed,
+    speed2: Number(speed).toFixed(2),
+    speed3: Number(speed).toFixed(3),
+    // speed4: Number(speed).toFixed(4),
+  })
+}
 
 function defineVideoController() {
   // Data structures
@@ -194,9 +209,8 @@ function defineVideoController() {
   };
 
   tc.videoController.prototype.initializeControls = function () {
-    log("initializeControls Begin", 5);
+    log("Begin", 5);
     const document = this.video.ownerDocument;
-    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     // getBoundingClientRect is relative to the viewport; style coordinates
     // are relative to offsetParent, so we adjust for that here. offsetParent
@@ -205,18 +219,10 @@ function defineVideoController() {
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
 
-    log("initializeControls: Speed set to: " + speed, 5);
-
     var wrapper = document.createElement("div");
     wrapper.classList.add("vsc-controller");
-
-    if (!this.video.currentSrc) {
-      wrapper.classList.add("vsc-nosource");
-    }
-
-    if (tc.settings.startHidden) {
-      wrapper.classList.add("vsc-hidden");
-    }
+    if (!this.video.currentSrc) wrapper.classList.add("vsc-nosource");
+    if (tc.settings.startHidden) wrapper.classList.add("vsc-hidden");
 
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = `
@@ -227,7 +233,7 @@ function defineVideoController() {
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">${speed}</span>
+          <span data-action="drag" class="draggable">--</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -376,7 +382,7 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = speed; //toFixed
+    video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed)
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -699,7 +705,7 @@ function setSpeed(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`)
   }
-  video.vsc.speedIndicator.textContent = speed;
+  video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed)
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);

@@ -1,11 +1,11 @@
 // src/common.js
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 var tcDefaults = {
-  version: "0.8.9",
+  version: "0.8.10",
   lastSpeed: 1,
   rememberSpeed: true,
   audioBoolean: false,
-  controllerOpacity: 0.38,
+  controllerOpacity: 0.6,
   enabled: true,
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
@@ -81,7 +81,7 @@ var tcDefaults = {
       [12, 1.9636364]
     ]
   },
-  speedSetChosen: "pitch432",
+  speedSetChosen: "common",
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true },
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true },
