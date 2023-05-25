@@ -15,7 +15,8 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSet = []
+let speedSet, speedNames, speedValues = []
+let speedName = '--'
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -88,12 +89,15 @@ function setKeyBindings(action, value) {
     "value"
   ] = value;
 }
-let strTemplate = '${name} : ${speed3}'
+
+let strTemplate = '${name} : ${speed3}' //TODO +1 number formatting, same width
 let injectTemplate =(obj)=> strTemplate.replace(/\${(.*?)}/g, (x,g)=> obj[g])
 function formatSpeedIndicator(speed) {
   let percent = (speed * 100)
+  let idx = speedValues.findIndex( num=> num == speed)
+  let name = speedNames[idx] ?? '--'
   return injectTemplate({
-    name: speedSet[0][0],
+    name: name,
     percent: percent.toFixed(0) +'%',
     percent1: percent.toFixed(1) +'%',
     percent2: percent.toFixed(2) +'%',
@@ -105,7 +109,17 @@ function formatSpeedIndicator(speed) {
 }
 
 function defineVideoController() {
+  //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
+  const unzip = (arr)=>
+    arr.reduce( (acc, val)=> (
+      val.forEach( (v, i)=>
+        acc[i].push(v)), acc
+      ), Array.from({
+        length: Math.max(...arr.map(x => x.length))
+      }).map(x => [])
+    );
+  [speedNames, speedValues] = unzip(speedSet)
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -666,28 +680,26 @@ function initializeNow(document) {
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
   log(`(${playbackRate})`, 4)
-  for (const [idx, pair] of speedSet.entries()) {
-    let [n, rate] = pair
-    rate = rate.toFixed(7)
-    log('+'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 4)
+  for (let idx = 0; idx<=speedValues.length; idx++) {
+    const rate = speedValues[idx].toFixed(7)
+    log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
     if (playbackRate === rate) {   
-      log('found at:'+ idx +'='+ n +'~'+ rate +'-'+ playbackRate, 3)
+      log('found at:'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 3)
       if (direction === '-') {
-        setSpeed(video, speedSet[idx-1][1]);
+        setSpeed(video, speedValues[idx-1]);
         break;
       }
       if (direction === '+') {
-        setSpeed(video, speedSet[idx+1][1]);
+        setSpeed(video, speedValues[idx+1]);
         break;
       }
     } else if (playbackRate < rate) {
       if (direction === '-') {
-        setSpeed(video, speedSet[idx-1][1]);
+        setSpeed(video, speedValues[idx-1]);
         break;
       }
       if (direction === '+') {
-        setSpeed(video, speedSet[idx][1]);
-        break;
+        setSpeed(video, speedValues[idx]);
       }
     }
   }

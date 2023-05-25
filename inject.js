@@ -25,60 +25,60 @@ var tcDefaults = {
       ["blazing", 3]
     ],
     pitch440: [
-      [-24, 0.25],
-      [-12, 0.5],
-      [-11, 0.5297315],
-      [-10, 0.561231],
-      [-9, 0.5946036],
-      [-8, 0.6299605],
-      [-7, 0.6674199],
-      [-6, 0.7071068],
-      [-5, 0.7491535],
-      [-4, 0.7937005],
-      [-3, 0.8408964],
-      [-2, 0.8908987],
-      [-1, 0.9438743],
-      [0, 1],
-      [1, 1.0594631],
-      [2, 1.122462],
-      [3, 1.1892071],
-      [4, 1.259921],
-      [5, 1.3348399],
-      [6, 1.4142136],
-      [7, 1.4983071],
-      [8, 1.5874011],
-      [9, 1.6817928],
-      [10, 1.7817974],
-      [11, 1.8877486],
-      [12, 2]
+      ["-24", 0.25],
+      ["-12", 0.5],
+      ["-11", 0.5297315],
+      ["-10", 0.561231],
+      ["-9", 0.5946036],
+      ["-8", 0.6299605],
+      ["-7", 0.6674199],
+      ["-6", 0.7071068],
+      ["-5", 0.7491535],
+      ["-4", 0.7937005],
+      ["-3", 0.8408964],
+      ["-2", 0.8908987],
+      ["-1", 0.9438743],
+      ["0", 1],
+      ["+1", 1.0594631],
+      ["+2", 1.122462],
+      ["+3", 1.1892071],
+      ["+4", 1.259921],
+      ["+5", 1.3348399],
+      ["+6", 1.4142136],
+      ["+7", 1.4983071],
+      ["+8", 1.5874011],
+      ["+9", 1.6817928],
+      ["+10", 1.7817974],
+      ["+11", 1.8877486],
+      ["+12", 2]
     ],
     pitch432: [
-      [-24, 0.2454545],
-      [-12, 0.4909091],
-      [-11, 0.5201001],
-      [-10, 0.5510268],
-      [-9, 0.5837926],
-      [-8, 0.6185067],
-      [-7, 0.655285],
-      [-6, 0.6942503],
-      [-5, 0.7355326],
-      [-4, 0.7792696],
-      [-3, 0.8256074],
-      [-2, 0.8747006],
-      [-1, 0.926713],
-      [0, 0.9818182],
-      [1, 1.0402001],
-      [2, 1.1020536],
-      [3, 1.1675852],
-      [4, 1.2370134],
-      [5, 1.31057],
-      [6, 1.3885006],
-      [7, 1.4710651],
-      [8, 1.5585392],
-      [9, 1.6512148],
-      [10, 1.7494011],
-      [11, 1.8534259],
-      [12, 1.9636364]
+      ["-24", 0.2454545],
+      ["-12", 0.4909091],
+      ["-11", 0.5201001],
+      ["-10", 0.5510268],
+      ["-9", 0.5837926],
+      ["-8", 0.6185067],
+      ["-7", 0.655285],
+      ["-6", 0.6942503],
+      ["-5", 0.7355326],
+      ["-4", 0.7792696],
+      ["-3", 0.8256074],
+      ["-2", 0.8747006],
+      ["-1", 0.926713],
+      ["+0", 0.9818182],
+      ["+1", 1.0402001],
+      ["+2", 1.1020536],
+      ["+3", 1.1675852],
+      ["+4", 1.2370134],
+      ["+5", 1.31057],
+      ["+6", 1.3885006],
+      ["+7", 1.4710651],
+      ["+8", 1.5585392],
+      ["+9", 1.6512148],
+      ["+10", 1.7494011],
+      ["+11", 1.8534259],
+      ["+12", 1.9636364]
     ]
   },
   speedSetChosen: "common",
@@ -129,8 +129,10 @@ var setKeyBindings = function(action, value) {
 };
 var formatSpeedIndicator = function(speed) {
   let percent = speed * 100;
+  let idx = speedValues.findIndex((num) => num == speed);
+  let name = speedNames[idx] ?? "--";
   return injectTemplate({
-    name: speedSet[0][0],
+    name,
     percent: percent.toFixed(0) + "%",
     percent1: percent.toFixed(1) + "%",
     percent2: percent.toFixed(2) + "%",
@@ -141,6 +143,10 @@ var formatSpeedIndicator = function(speed) {
 };
 var defineVideoController = function() {
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
+  const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
+    length: Math.max(...arr.map((x) => x.length))
+  }).map((x) => []));
+  [speedNames, speedValues] = unzip(speedSet);
   tc.videoController = function(target, parent) {
     if (target.vsc) {
       return target.vsc;
@@ -542,28 +548,26 @@ var initializeNow = function(document2) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  for (const [idx, pair] of speedSet.entries()) {
-    let [n, rate] = pair;
-    rate = rate.toFixed(7);
-    log("+" + idx + "=" + n + "~" + rate + "-" + playbackRate, 4);
+  for (let idx = 0;idx <= speedValues.length; idx++) {
+    const rate = speedValues[idx].toFixed(7);
+    log("+" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 4);
     if (playbackRate === rate) {
-      log("found at:" + idx + "=" + n + "~" + rate + "-" + playbackRate, 3);
+      log("found at:" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 3);
       if (direction === "-") {
-        setSpeed(video, speedSet[idx - 1][1]);
+        setSpeed(video, speedValues[idx - 1]);
         break;
       }
       if (direction === "+") {
-        setSpeed(video, speedSet[idx + 1][1]);
+        setSpeed(video, speedValues[idx + 1]);
         break;
       }
     } else if (playbackRate < rate) {
       if (direction === "-") {
-        setSpeed(video, speedSet[idx - 1][1]);
+        setSpeed(video, speedValues[idx - 1]);
         break;
       }
       if (direction === "+") {
-        setSpeed(video, speedSet[idx][1]);
-        break;
+        setSpeed(video, speedValues[idx]);
       }
     }
   }
@@ -713,7 +717,9 @@ var tc = {
   },
   mediaElements: []
 };
-var speedSet = [];
+var speedSet;
+var speedNames;
+var speedValues = [];
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
