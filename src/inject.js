@@ -109,6 +109,7 @@ function formatSpeedIndicator(speed) {
 }
 
 function defineVideoController() {
+  // refresh global settings var
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
@@ -244,11 +245,10 @@ function defineVideoController() {
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
         </style>
-
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
     }">
-          <span data-action="drag" class="draggable">--</span>
+          <span data-action="drag" class="draggable">--</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
