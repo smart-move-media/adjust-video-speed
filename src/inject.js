@@ -90,14 +90,14 @@ function setKeyBindings(action, value) {
   ] = value;
 }
 
-let strTemplate = '${name} : ${speed3}' //TODO +1 number formatting, same width
-let injectTemplate =(obj)=> strTemplate.replace(/\${(.*?)}/g, (x,g)=> obj[g])
+let injectTemplate =(obj)=> tc.settings.speedTemplate.replace(/\${(.*?)}/g, (x,g)=> obj[g])
 function formatSpeedIndicator(speed) {
   let percent = (speed * 100)
-  let idx = speedValues.findIndex( num=> num == speed)
+  let idx = speedValues.findIndex(num=> num == speed)
   let name = speedNames[idx] ?? '--'
   return injectTemplate({
     name: name,
+    //TODO +1 number formatting
     percent: percent.toFixed(0) +'%',
     percent1: percent.toFixed(1) +'%',
     percent2: percent.toFixed(2) +'%',
@@ -249,7 +249,7 @@ function defineVideoController() {
         <div id="controller"
           style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
         >
-          <span data-action="drag" class="draggable">${formatSpeedIndicator(speed)}</span><br>
+          <span data-action="drag" class="draggable">--</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -260,30 +260,32 @@ function defineVideoController() {
         </div>
       `;
     shadow.innerHTML = shadowTemplate;
-    shadow.querySelector(".draggable").addEventListener(
-      "mousedown",
-      (e) => {
-        runAction(e.target.dataset["action"], false, e);
-        e.stopPropagation();
-      },
-      true
-    );
-
-    shadow.querySelectorAll("button").forEach(function (button) {
-      button.addEventListener(
-        "click",
+    shadow
+      .querySelector(".draggable")
+      .addEventListener(
+        "mousedown",
         (e) => {
-          runAction(
-            e.target.dataset["action"],
-            getKeyBindings(e.target.dataset["action"]),
-            e
-          );
+          runAction(e.target.dataset["action"], false, e);
           e.stopPropagation();
         },
         true
       );
-    });
-
+    shadow
+      .querySelectorAll("button")
+      .forEach(function (button) {
+        button.addEventListener(
+          "click",
+          (e) => {
+            runAction(
+              e.target.dataset["action"],
+              getKeyBindings(e.target.dataset["action"]),
+              e
+            );
+            e.stopPropagation();
+          },
+          true
+        );
+      });
     shadow
       .querySelector("#controller")
       .addEventListener("click", (e) => e.stopPropagation(), false);
@@ -292,6 +294,7 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.speedIndicator = shadow.querySelector("span");
+    this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
@@ -398,7 +401,7 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed)
+    video.vsc.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -719,7 +722,7 @@ function setSpeed(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`)
   }
-  video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed)
+  video.vsc.speedIndicator.setHTML( formatSpeedIndicator(speed) );
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);

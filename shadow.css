@@ -23,48 +23,45 @@
   cursor: default;
   z-index: 9999999;
 }
-
 #controller:hover {
   opacity: 0.7;
 }
-
 #controller:hover > .draggable {
   margin-right: 0.8em;
+}
+
+.draggable {
+  cursor: grab;
+}
+.draggable:active {
+  cursor: grabbing;
+}
+#controller.dragging {
+  cursor: grabbing;
+  opacity: 0.7;
+}
+#controller.dragging #controls {
+  display: inline;
 }
 
 #controls {
   display: none;
 }
 
-#controller.dragging {
-  cursor: grabbing;
-  opacity: 0.7;
-}
-
-#controller.dragging #controls {
-  display: inline;
-}
-
-.draggable {
-  cursor: grab;
-}
-
-.draggable:active {
-  cursor: grabbing;
-}
 
 button {
   opacity: 1;
   cursor: pointer;
   color: black;
   background: white;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
   font-weight: normal;
+
   border-radius: 5px;
   padding: 1px 5px 3px 5px;
-  font-size: 14px;
   line-height: 14px;
   border: 0px solid white;
-  font-family: "Lucida Console", Monaco, monospace;
   margin: 0px 2px 2px 2px;
   transition: background 0.2s, color 0.2s;
 }

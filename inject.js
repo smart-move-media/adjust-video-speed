@@ -10,6 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
   speedSets: {
     common: [
       ["snail", 0.1],
@@ -235,7 +236,7 @@ var defineVideoController = function() {
         <div id="controller"
           style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
         >
-          <span data-action="drag" class="draggable">${formatSpeedIndicator(speed)}</span><br>
+          <span data-action="drag" class="draggable">--</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -259,6 +260,7 @@ var defineVideoController = function() {
     shadow.querySelector("#controller").addEventListener("click", (e) => e.stopPropagation(), false);
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
     this.speedIndicator = shadow.querySelector("span");
+    this.speedIndicator.setHTML(formatSpeedIndicator(speed));
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
     switch (true) {
@@ -334,7 +336,7 @@ var setupListener = function() {
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed);
+    video.vsc.speedIndicator.setHTML(formatSpeedIndicator(speed));
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -586,7 +588,7 @@ var setSpeed = function(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
-  video.vsc.speedIndicator.textContent = formatSpeedIndicator(speed);
+  video.vsc.speedIndicator.setHTML(formatSpeedIndicator(speed));
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -760,7 +762,6 @@ chrome.storage.sync.get(tc.settings, function(storage) {
   }
   initializeWhenReady(document);
 });
-var strTemplate = "${name} : ${speed3}";
-var injectTemplate = (obj) => strTemplate.replace(/\${(.*?)}/g, (x, g) => obj[g]);
+var injectTemplate = (obj) => tc.settings.speedTemplate.replace(/\${(.*?)}/g, (x, g) => obj[g]);
 var coolDown = false;
 var timer = null;

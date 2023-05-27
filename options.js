@@ -10,6 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
   speedSets: {
     common: [
       ["snail", 0.1],

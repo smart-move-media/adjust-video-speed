@@ -9,6 +9,7 @@ export let tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
+  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
   // ensure speeds are listed slowest to fastest
   speedSets: {
     common: [
