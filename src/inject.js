@@ -178,7 +178,7 @@ function defineVideoController() {
       // override a website's intentional initial speed setting interfering
       // with the site's default behavior)
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
-      setSpeed(event.target, storedSpeed, 'explicit');
+      setSpeed(event.target, storedSpeed);
     };
 
     target.addEventListener(
@@ -227,6 +227,7 @@ function defineVideoController() {
   tc.videoController.prototype.initializeControls = function () {
     log("Begin", 5);
     const document = this.video.ownerDocument;
+    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     // getBoundingClientRect is relative to the viewport; style coordinates
     // are relative to offsetParent, so we adjust for that here. offsetParent
@@ -245,10 +246,10 @@ function defineVideoController() {
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
         </style>
-        <div id="controller" style="top:${top}; left:${left}; opacity:${
-      tc.settings.controllerOpacity
-    }">
-          <span data-action="drag" class="draggable">--</span><br>
+        <div id="controller"
+          style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
+        >
+          <span data-action="drag" class="draggable">${formatSpeedIndicator(speed)}</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -700,11 +701,11 @@ function changeSpeed(video, direction='') {
       }
       if (direction === '+') {
         setSpeed(video, speedValues[idx]);
+        break;
       }
     }
   }
 }
-
 function setSpeed(video, speed) {
   speed = Number(speed).toFixed(7);
   log(" started: " + speed, 5);

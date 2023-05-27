@@ -182,7 +182,7 @@ var defineVideoController = function() {
         storedSpeed = tc.settings.lastSpeed;
       }
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
-      setSpeed(event.target, storedSpeed, "explicit");
+      setSpeed(event.target, storedSpeed);
     };
     target.addEventListener("play", this.handlePlay = mediaEventAction.bind(this));
     target.addEventListener("seeked", this.handleSeek = mediaEventAction.bind(this));
@@ -216,6 +216,7 @@ var defineVideoController = function() {
   tc.videoController.prototype.initializeControls = function() {
     log("Begin", 5);
     const document2 = this.video.ownerDocument;
+    const speed = Number(this.video.playbackRate).toFixed(7);
     const rect = this.video.getBoundingClientRect();
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
@@ -231,8 +232,10 @@ var defineVideoController = function() {
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
         </style>
-        <div id="controller" style="top:${top}; left:${left}; opacity:${tc.settings.controllerOpacity}">
-          <span data-action="drag" class="draggable">--</span><br>
+        <div id="controller"
+          style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
+        >
+          <span data-action="drag" class="draggable">${formatSpeedIndicator(speed)}</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -567,6 +570,7 @@ var changeSpeed = function(video, direction = "") {
       }
       if (direction === "+") {
         setSpeed(video, speedValues[idx]);
+        break;
       }
     }
   }
