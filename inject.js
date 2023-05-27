@@ -239,9 +239,9 @@ var defineVideoController = function() {
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
+            <button data-action="listspeeds" class="rw">&equiv;</button>
             <button data-action="faster">&plus;</button>
             <button data-action="advance" class="rw">\xBB</button>
-            <button data-action="display" class="hideButton">&times;</button>
           </span>
         </div>
       `;
@@ -550,26 +550,26 @@ var initializeNow = function(document2) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  for (let idx = 0;idx <= speedValues.length; idx++) {
+  for (let idx = 0;idx < speedValues.length; idx++) {
     const rate = speedValues[idx].toFixed(7);
     log("+" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 4);
     if (playbackRate === rate) {
       log("found at:" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 3);
       if (direction === "-") {
-        setSpeed(video, speedValues[idx - 1]);
+        setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
         break;
       }
       if (direction === "+") {
-        setSpeed(video, speedValues[idx + 1]);
+        setSpeed(video, speedValues[Math.min(idx + 1, speedValues.length - 1)]);
         break;
       }
     } else if (playbackRate < rate) {
       if (direction === "-") {
-        setSpeed(video, speedValues[idx - 1]);
+        setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
         break;
       }
       if (direction === "+") {
-        setSpeed(video, speedValues[idx]);
+        setSpeed(video, speedValues[Math.min(idx, speedValues.length - 1)]);
         break;
       }
     }
