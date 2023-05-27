@@ -687,25 +687,19 @@ function changeSpeed(video, direction='') {
   for (let idx = 0; idx<speedValues.length; idx++) {
     const rate = speedValues[idx].toFixed(7)
     log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
-    if (playbackRate === rate) {   
-      log('found at:'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 3)
-      if (direction === '-') {
-        setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
-        break;
-      }
-      if (direction === '+') {
-        setSpeed(video, speedValues[ Math.min(idx+1, speedValues.length-1) ]);
-        break;
-      }
-    } else if (playbackRate < rate) {
-      if (direction === '-') {
-        setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
-        break;
-      }
-      if (direction === '+') {
-        setSpeed(video, speedValues[ Math.min(idx, speedValues.length-1) ]);
-        break;
-      }
+    if (playbackRate > rate) continue
+    if (direction === '-') {
+      // Video min rate is 0.0625:
+      // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
+      setSpeed(video, Math.max( speedValues[ Math.max(idx-1, 0) ], 0.0625 ));
+      break;
+    } else if (direction === '+') {
+      if (playbackRate === rate) idx += 1
+      // if playbackRate < rate keep idx
+      // Maximum playback speed in Chrome is set to 16:
+      // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
+      setSpeed(video, Math.min( speedValues[ Math.min(idx, speedValues.length-1) ], 16 ));
+      break;
     }
   }
 }
@@ -757,21 +751,9 @@ function runAction(action, value, e) {
         v.currentTime += value;
       } else if (action === "faster") {
         log("Increase speed", 5);
-        // Maximum playback speed in Chrome is set to 16:
-        // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-        // const s = Math.min(
-        //   (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
-        //   16
-        // );
-        // setSpeed(v, s, '+');
-
         changeSpeed(v, '+')
       } else if (action === "slower") {
         log("Decrease speed", 5);
-       // Video min rate is 0.0625:
-        // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-        // const s = Math.max(v.playbackRate - value, 0.07);
-        // setSpeed(v, s, '-');
         changeSpeed(v, '-')
       // } else if (action === "reset") {
       //   log("Reset speed", 5);

@@ -555,25 +555,16 @@ var changeSpeed = function(video, direction = "") {
   for (let idx = 0;idx < speedValues.length; idx++) {
     const rate = speedValues[idx].toFixed(7);
     log("+" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 4);
-    if (playbackRate === rate) {
-      log("found at:" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 3);
-      if (direction === "-") {
-        setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
-        break;
-      }
-      if (direction === "+") {
-        setSpeed(video, speedValues[Math.min(idx + 1, speedValues.length - 1)]);
-        break;
-      }
-    } else if (playbackRate < rate) {
-      if (direction === "-") {
-        setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
-        break;
-      }
-      if (direction === "+") {
-        setSpeed(video, speedValues[Math.min(idx, speedValues.length - 1)]);
-        break;
-      }
+    if (playbackRate > rate)
+      continue;
+    if (direction === "-") {
+      setSpeed(video, Math.max(speedValues[Math.max(idx - 1, 0)], 0.0625));
+      break;
+    } else if (direction === "+") {
+      if (playbackRate === rate)
+        idx += 1;
+      setSpeed(video, Math.min(speedValues[Math.min(idx, speedValues.length - 1)], 16));
+      break;
     }
   }
 };

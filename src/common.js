@@ -11,6 +11,10 @@ export let tcDefaults = {
   startHidden: false,
   speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
   // ensure speeds are listed slowest to fastest
+  // Max playback speed in Chrome is set to 16:
+  // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
+  // Video min rate is 0.0625:
+  // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
   speedSets: {
     common: [
       ['snail', 0.1],
