@@ -9,6 +9,7 @@
 }
 
 #controller {
+  user-select: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -55,37 +56,50 @@ button {
   color: black;
   background: white;
   font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 14px;
-  font-weight: normal;
+  font-size: 21px;
+  font-weight: bold;
 
   border-radius: 5px;
-  padding: 1px 5px 3px 5px;
-  line-height: 14px;
+  padding: 3px 5px 3px 5px;
+  line-height: 16px;
   border: 0px solid white;
   margin: 0px 2px 2px 2px;
   transition: background 0.2s, color 0.2s;
 }
-
 button:focus {
   outline: 0;
 }
-
 button:hover {
   opacity: 1;
   background: #2196f3;
   color: #ffffff;
 }
-
 button:active {
   background: #2196f3;
   color: #ffffff;
   font-weight: bold;
 }
-
 button.rw {
   opacity: 0.75;
 }
 button.hideButton {
   opacity: 0.75;
   margin-right: 2px;
+}
+
+b[data-action="drag"] {
+  opacity: 1;
+  cursor: pointer;
+  color: black;
+  background: white;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 19px;
+  font-weight: bold;
+
+  border-radius: 5px;
+  padding: 1px 5px 0 5px;
+  line-height: 16px;
+  border: 0px solid white;
+  margin: 2px;
+  transition: background 0.2s, color 0.2s;
 }

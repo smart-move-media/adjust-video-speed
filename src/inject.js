@@ -249,7 +249,8 @@ function defineVideoController() {
         <div id="controller"
           style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
         >
-          <span data-action="drag" class="draggable">--</span><br>
+          <b data-action="drag" class="draggable">&equiv;</b>
+          <span id="speedDisplay">--</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
             <button data-action="slower">&minus;</button>
@@ -265,8 +266,9 @@ function defineVideoController() {
       .addEventListener(
         "mousedown",
         (e) => {
-          runAction(e.target.dataset["action"], false, e);
-          e.stopPropagation();
+          // e.preventDefault();
+          runAction(e.target.dataset["action"], null, e);
+          // e.stopPropagation();
         },
         true
       );
@@ -293,7 +295,7 @@ function defineVideoController() {
       .querySelector("#controller")
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
-    this.speedIndicator = shadow.querySelector("span");
+    this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
@@ -724,23 +726,18 @@ function setSpeed(video, speed) {
 
 function runAction(action, value, e) {
   log("runAction Begin", 5);
-
-  var mediaTags = tc.mediaElements;
-
+  let mediaTags = tc.mediaElements;
   // Get the controller that was used if called from a button press event e
   if (e) {
     var targetController = e.target.getRootNode().host;
   }
 
   mediaTags.forEach(function (v) {
-    var controller = v.vsc.div;
-
+    let controller = v.vsc.div;
     // Don't change video speed if the video has a different controller
-    if (e && !(targetController == controller)) {
-      return;
-    }
+    if (e && !(targetController == controller)) return;
 
-    showController(controller);
+    // showController(controller);
 
     if (!v.classList.contains("vsc-cancelled")) {
       if (action === "rewind") {
@@ -873,6 +870,7 @@ function handleDrag(video, e) {
     style.top = initialControllerXY[1] + dy + "px";
   };
   const stopDragging = () => {
+    log("stopping drag", 5);
     parentElement.removeEventListener("mousemove", startDragging);
     parentElement.removeEventListener("mouseup", stopDragging);
     parentElement.removeEventListener("mouseleave", stopDragging);

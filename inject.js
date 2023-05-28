@@ -236,7 +236,8 @@ var defineVideoController = function() {
         <div id="controller"
           style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
         >
-          <span data-action="drag" class="draggable">--</span><br>
+          <b data-action="drag" class="draggable">&equiv;</b>
+          <span id="speedDisplay">--</span><br>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -248,8 +249,7 @@ var defineVideoController = function() {
       `;
     shadow.innerHTML = shadowTemplate;
     shadow.querySelector(".draggable").addEventListener("mousedown", (e) => {
-      runAction(e.target.dataset["action"], false, e);
-      e.stopPropagation();
+      runAction(e.target.dataset["action"], null, e);
     }, true);
     shadow.querySelectorAll("button").forEach(function(button) {
       button.addEventListener("click", (e) => {
@@ -259,7 +259,7 @@ var defineVideoController = function() {
     });
     shadow.querySelector("#controller").addEventListener("click", (e) => e.stopPropagation(), false);
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
-    this.speedIndicator = shadow.querySelector("span");
+    this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML(formatSpeedIndicator(speed));
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
@@ -586,16 +586,14 @@ var setSpeed = function(video, speed) {
 };
 var runAction = function(action, value, e) {
   log("runAction Begin", 5);
-  var mediaTags = tc.mediaElements;
+  let mediaTags = tc.mediaElements;
   if (e) {
     var targetController = e.target.getRootNode().host;
   }
   mediaTags.forEach(function(v) {
-    var controller = v.vsc.div;
-    if (e && !(targetController == controller)) {
+    let controller = v.vsc.div;
+    if (e && !(targetController == controller))
       return;
-    }
-    showController(controller);
     if (!v.classList.contains("vsc-cancelled")) {
       if (action === "rewind") {
         log("Rewind", 5);
@@ -682,6 +680,7 @@ var handleDrag = function(video, e) {
     style.top = initialControllerXY[1] + dy + "px";
   };
   const stopDragging = () => {
+    log("stopping drag", 5);
     parentElement.removeEventListener("mousemove", startDragging);
     parentElement.removeEventListener("mouseup", stopDragging);
     parentElement.removeEventListener("mouseleave", stopDragging);
@@ -691,17 +690,6 @@ var handleDrag = function(video, e) {
   parentElement.addEventListener("mouseup", stopDragging);
   parentElement.addEventListener("mouseleave", stopDragging);
   parentElement.addEventListener("mousemove", startDragging);
-};
-var showController = function(controller) {
-  log("Showing controller", 4);
-  controller.classList.add("vcs-show");
-  if (timer)
-    clearTimeout(timer);
-  timer = setTimeout(function() {
-    controller.classList.remove("vcs-show");
-    timer = false;
-    log("Hiding controller", 5);
-  }, 2000);
 };
 var SettingFieldsBeforeSync = new Map;
 SettingFieldsBeforeSync.set("blacklist", (data) => data.replace(regStrip, ""));
@@ -755,4 +743,3 @@ chrome.storage.sync.get(tc.settings, function(storage) {
 });
 var injectTemplate = (obj) => tc.settings.speedTemplate.replace(/\${(.*?)}/g, (x, g) => obj[g]);
 var coolDown = false;
-var timer = null;
