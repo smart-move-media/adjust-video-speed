@@ -265,6 +265,7 @@ var defineVideoController = function() {
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML(formatSpeedIndicator(speed));
     this.speedList = shadow.querySelector("#speedList");
+    this.btnListSpeeds = shadow.querySelector("[data-action='listspeeds']");
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
     switch (true) {
@@ -595,7 +596,7 @@ var runAction = function(action, value, e) {
     var targetController = e.target.getRootNode().host;
   }
   mediaTags.forEach(function(v) {
-    let controller = v.vsc.div;
+    const controller = v.vsc.div;
     if (e && !(targetController == controller))
       return;
     if (!v.classList.contains("vsc-cancelled")) {
@@ -614,6 +615,7 @@ var runAction = function(action, value, e) {
       } else if (action === "listspeeds") {
         log("list speeds", 5);
         v.vsc.speedList.classList.toggle("show");
+        v.vsc.btnListSpeeds.classList.toggle("on");
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");
