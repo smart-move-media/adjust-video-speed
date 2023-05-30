@@ -4,5 +4,10 @@
   },
   "scripts": {
     "build": "bun .bun/build.js"
+  },
+  "tooling": {
+    "VSCode": {
+      "FAST Tagged Template Literals": "https://github.com/microsoft/fast/tree/master/packages/tooling/fast-vscode-syntax-highlighting"
+    }
   }
 }

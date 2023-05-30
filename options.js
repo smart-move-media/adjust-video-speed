@@ -10,7 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
+  speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i id="hoverShow" style="min-width:3.3em;">: ${name}</i>',
   speedSets: {
     common: [
       ["snail", 0.1],
@@ -99,6 +99,7 @@ var tcDefaults = {
   playersSpeed: {},
   mediaElements: []
 };
+//! ensure speeds are listed slowest to fastest
 
 // src/options.js
 var recordKeyPress = function(e) {

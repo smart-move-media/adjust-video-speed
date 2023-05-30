@@ -1,7 +1,7 @@
 * {
-  line-height: 1.8em;
+  line-height: 1.9em;
   font-family: sans-serif;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 :host(:hover) #controls {
@@ -41,11 +41,12 @@
   cursor: grabbing;
   opacity: 0.7;
 }
-#controller.dragging #controls {
+#controller.dragging #controls,
+#controller:hover #hoverShow {
   display: inline;
 }
-
-#controls {
+#controls,
+#hoverShow {
   display: none;
 }
 
@@ -87,6 +88,9 @@ button.hideButton {
   margin-right: 2px;
 }
 
+#controllerTop {
+  margin: 2px 2px 1.5px 0;
+}
 b[data-action="drag"] {
   opacity: 1;
   cursor: pointer;

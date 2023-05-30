@@ -10,7 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
+  speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i id="hoverShow" style="min-width:3.3em;">: ${name}</i>',
   speedSets: {
     common: [
       ["snail", 0.1],
@@ -99,23 +99,15 @@ var tcDefaults = {
   playersSpeed: {},
   mediaElements: []
 };
+//! ensure speeds are listed slowest to fastest
 
 // src/inject.js
-var log = function(message, level = 4) {
+var log = function(msg, level = 4) {
   if (tc.settings.logLevel >= level) {
-    message = `${log.caller?.name ?? "unknown"}: ${message}`;
-    if (level === 2) {
-      console.log("ERROR:" + message);
-    } else if (level === 3) {
-      console.log("WARNING:" + message);
-    } else if (level === 4) {
-      console.log("INFO:" + message);
-    } else if (level === 5) {
-      console.log("DEBUG:" + message);
-    } else if (level === 6) {
-      console.log("DEBUG (VERBOSE):" + message);
+    msg = `${log.caller?.name ?? "?"}: ${msg}`;
+    console.log(`${LOG_LEVEL_ENUM[level]}: ${msg}`);
+    if (level === 6)
       console.trace();
-    }
   }
 };
 var getKeyBindings = function(action, what = "value") {
@@ -141,6 +133,9 @@ var formatSpeedIndicator = function(speed) {
     speed2: Number(speed).toFixed(2),
     speed3: Number(speed).toFixed(3)
   });
+};
+var buildSpeedList = function() {
+  return "speeds";
 };
 var defineVideoController = function() {
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
@@ -236,8 +231,10 @@ var defineVideoController = function() {
         <div id="controller"
           style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
         >
-          <b data-action="drag" class="draggable">&equiv;</b>
-          <span id="speedDisplay">--</span><br>
+          <div id="controllerTop">
+            <b data-action="drag" class="draggable">&equiv;</b>
+            <span id="speedDisplay">--</span>
+          </div>
           <span id="controls">
             <button data-action="rewind" class="rw">\xAB</button>
             <button data-action="slower">&minus;</button>
@@ -245,6 +242,9 @@ var defineVideoController = function() {
             <button data-action="faster">&plus;</button>
             <button data-action="advance" class="rw">\xBB</button>
           </span>
+          <div id="speedList">
+            ${buildSpeedList()}
+          </div>
         </div>
       `;
     shadow.innerHTML = shadowTemplate;
@@ -708,6 +708,13 @@ for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);
 }
+var LOG_LEVEL_ENUM = {
+  2: "ERROR",
+  3: "WARNING",
+  4: "Info",
+  5: "Debug",
+  6: "Debug-Verbose"
+};
 chrome.storage.sync.get(tc.settings, function(storage) {
   tc.settings.keyBindings = storage.keyBindings;
   if (storage.keyBindings.length == 0) {

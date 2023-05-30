@@ -9,8 +9,8 @@ export let tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<i style="display:inline-block;min-width:3.3em;">${name}</i> : <b style="display:inline-block;min-width:2.9em;">${speed3}</b>',
-  // ensure speeds are listed slowest to fastest
+  speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i id="hoverShow" style="min-width:3.3em;">: ${name}</i>',
+  //! ensure speeds are listed slowest to fastest
   // Max playback speed in Chrome is set to 16:
   // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
   // Video min rate is 0.0625:
