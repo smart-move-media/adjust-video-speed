@@ -16,7 +16,6 @@ var tc = {
   mediaElements: []
 };
 let speedSet, speedNames, speedValues = []
-let speedName = '--'
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -87,11 +86,15 @@ function setKeyBindings(action, value) {
   ] = value;
 }
 
-let injectTemplate =(obj)=> tc.settings.speedTemplate.replace(/\${(.*?)}/g, (x,g)=> obj[g])
-function formatSpeedIndicator(speed) {
+let injectTemplate =(obj)=>
+  tc.settings.speedTemplate
+    .replace(/\${(.*?)}/g, (x,g)=> obj[g])
+function formatSpeedIndicator(
+  speed,
+  idx = speedValues.findIndex(num=> num == speed),
+  name = speedNames[idx] ?? '--',
+) {
   let percent = (speed * 100)
-  let idx = speedValues.findIndex(num=> num == speed)
-  let name = speedNames[idx] ?? '--'
   return injectTemplate({
     name: name,
     //TODO +1 number formatting
@@ -106,7 +109,16 @@ function formatSpeedIndicator(speed) {
 }
 
 function buildSpeedList() {
-  return 'speeds'
+  let speedList = /*html*/`<div id="speedList">
+<br>`
+  for (let idx = 0; idx<speedValues.length; idx++) {
+    // const rate = speedValues[idx].toFixed(7)
+    speedList += /*html*/`<button>${formatSpeedIndicator( speedValues[idx], idx)}</button><br>
+`
+  }
+  return /*html*/`${speedList}
+</div>
+`
 }
 
 function defineVideoController() {
@@ -260,10 +272,7 @@ function defineVideoController() {
             <button data-action="listspeeds" class="rw">&equiv;</button>
             <button data-action="faster">&plus;</button>
             <button data-action="advance" class="rw">»</button>
-          </span>
-          <div id="speedList">
-            ${buildSpeedList()}
-          </div>
+          </span>${buildSpeedList()}
         </div>
       `;
     shadow.innerHTML = shadowTemplate;
@@ -303,6 +312,7 @@ function defineVideoController() {
 
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+    this.speedList = shadow.querySelector("#speedList");
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
@@ -761,6 +771,10 @@ function runAction(action, value, e) {
       // } else if (action === "reset") {
       //   log("Reset speed", 5);
       //   resetSpeed(v, 1.0);
+      } else if (action === "listspeeds") {
+        log("list speeds", 5);
+        v.vsc.speedList.classList.toggle("show");
+        //TODO! toggle on button, CSS show needs :hover, unshow when vsc-hidden
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");

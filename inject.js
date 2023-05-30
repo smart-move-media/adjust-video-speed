@@ -10,7 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i id="hoverShow" style="min-width:3.3em;">: ${name}</i>',
+  speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i class="hoverShow" style="min-width:3.3em;">: ${name}</i>',
   speedSets: {
     common: [
       ["snail", 0.1],
@@ -120,10 +120,8 @@ var getKeyBindings = function(action, what = "value") {
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
-var formatSpeedIndicator = function(speed) {
+var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => num == speed), name = speedNames[idx] ?? "--") {
   let percent = speed * 100;
-  let idx = speedValues.findIndex((num) => num == speed);
-  let name = speedNames[idx] ?? "--";
   return injectTemplate({
     name,
     percent: percent.toFixed(0) + "%",
@@ -135,7 +133,15 @@ var formatSpeedIndicator = function(speed) {
   });
 };
 var buildSpeedList = function() {
-  return "speeds";
+  let speedList = `<div id="speedList">
+<br>`;
+  for (let idx = 0;idx < speedValues.length; idx++) {
+    speedList += `<button>${formatSpeedIndicator(speedValues[idx], idx)}</button><br>
+`;
+  }
+  return `${speedList}
+</div>
+`;
 };
 var defineVideoController = function() {
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
@@ -241,10 +247,7 @@ var defineVideoController = function() {
             <button data-action="listspeeds" class="rw">&equiv;</button>
             <button data-action="faster">&plus;</button>
             <button data-action="advance" class="rw">\xBB</button>
-          </span>
-          <div id="speedList">
-            ${buildSpeedList()}
-          </div>
+          </span>${buildSpeedList()}
         </div>
       `;
     shadow.innerHTML = shadowTemplate;
@@ -261,6 +264,7 @@ var defineVideoController = function() {
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML(formatSpeedIndicator(speed));
+    this.speedList = shadow.querySelector("#speedList");
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
     switch (true) {
@@ -607,6 +611,9 @@ var runAction = function(action, value, e) {
       } else if (action === "slower") {
         log("Decrease speed", 5);
         changeSpeed(v, "-");
+      } else if (action === "listspeeds") {
+        log("list speeds", 5);
+        v.vsc.speedList.classList.toggle("show");
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");

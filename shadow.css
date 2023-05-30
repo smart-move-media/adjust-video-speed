@@ -1,11 +1,7 @@
 * {
-  line-height: 1.9em;
+  line-height: 1.7em;
   font-family: sans-serif;
   font-size: 14px;
-}
-
-:host(:hover) #controls {
-  display: inline;
 }
 
 #controller {
@@ -41,12 +37,19 @@
   cursor: grabbing;
   opacity: 0.7;
 }
+
+:host(:hover) #controls,
+/* :host(:hover) #speedList, */
 #controller.dragging #controls,
-#controller:hover #hoverShow {
+#controller:hover .hoverShow {
+  display: inline;
+}
+#speedList.show {
   display: inline;
 }
 #controls,
-#hoverShow {
+.hoverShow,
+#speedList {
   display: none;
 }
 
@@ -86,6 +89,13 @@ button.rw {
 button.hideButton {
   opacity: 0.75;
   margin-right: 2px;
+}
+#speedList > button {
+  min-width: 15em;
+  padding: 0 0.3em;
+  line-height: 15px;
+  border: 0px solid white;
+  margin: 2px 0;
 }
 
 #controllerTop {
