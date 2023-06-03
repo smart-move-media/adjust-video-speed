@@ -120,9 +120,10 @@ var getKeyBindings = function(action, what = "value") {
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
-var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => num == speed), name = speedNames[idx] ?? "--") {
+var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => num == speed), action = "drag", name = speedNames[idx] ?? "--") {
   let percent = speed * 100;
   return injectTemplate({
+    action,
     name,
     percent: percent.toFixed(0) + "%",
     percent1: percent.toFixed(1) + "%",
@@ -136,8 +137,10 @@ var buildSpeedList = function() {
   let speedList = `<div id="speedList">
 <br>`;
   for (let idx = 0;idx < speedValues.length; idx++) {
-    speedList += `<button>${formatSpeedIndicator(speedValues[idx], idx)}</button><br>
-`;
+    speedList += `<button data-action="jumpspeed" data-value="${speedValues[idx]}">
+${formatSpeedIndicator(speedValues[idx], idx)}
+</button>
+<br>`;
   }
   return `${speedList}
 </div>
@@ -256,7 +259,7 @@ var defineVideoController = function() {
     }, true);
     shadow.querySelectorAll("button").forEach(function(button) {
       button.addEventListener("click", (e) => {
-        runAction(e.target.dataset["action"], getKeyBindings(e.target.dataset["action"]), e);
+        runAction(e.currentTarget.dataset["action"], e.currentTarget.dataset["value"] || getKeyBindings(e.currentTarget.dataset["action"]), e);
         e.stopPropagation();
       }, true);
     });
@@ -563,18 +566,18 @@ var changeSpeed = function(video, direction = "") {
     if (playbackRate > rate)
       continue;
     if (direction === "-") {
-      setSpeed(video, Math.max(speedValues[Math.max(idx - 1, 0)], 0.0625));
+      setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
       break;
     } else if (direction === "+") {
       if (playbackRate === rate)
         idx += 1;
-      setSpeed(video, Math.min(speedValues[Math.min(idx, speedValues.length - 1)], 16));
+      setSpeed(video, speedValues[Math.min(idx, speedValues.length - 1)]);
       break;
     }
   }
 };
 var setSpeed = function(video, speed) {
-  speed = Number(speed).toFixed(7);
+  speed = Number(Math.max(Math.min(speed, 16), 0.0625)).toFixed(7);
   log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(new CustomEvent("ratechange", {
@@ -616,6 +619,11 @@ var runAction = function(action, value, e) {
         log("list speeds", 5);
         v.vsc.speedList.classList.toggle("show");
         v.vsc.btnListSpeeds.classList.toggle("on");
+      } else if (action === "jumpspeed") {
+        log("jump speed:" + value, 5);
+        v.vsc.speedList.classList.toggle("show");
+        v.vsc.btnListSpeeds.classList.toggle("on");
+        setSpeed(v, value);
       } else if (action === "display") {
         log("Showing controller", 5);
         controller.classList.add("vsc-manual");

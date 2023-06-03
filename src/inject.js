@@ -92,10 +92,12 @@ let injectTemplate =(obj)=>
 function formatSpeedIndicator(
   speed,
   idx = speedValues.findIndex(num=> num == speed),
+  action = 'drag',
   name = speedNames[idx] ?? '--',
 ) {
   let percent = (speed * 100)
   return injectTemplate({
+    action: action, // RESERVED
     name: name,
     //TODO +1 number formatting
     percent: percent.toFixed(0) +'%',
@@ -113,8 +115,10 @@ function buildSpeedList() {
 <br>`
   for (let idx = 0; idx<speedValues.length; idx++) {
     // const rate = speedValues[idx].toFixed(7)
-    speedList += /*html*/`<button>${formatSpeedIndicator( speedValues[idx], idx)}</button><br>
-`
+    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedValues[idx]}">
+${formatSpeedIndicator( speedValues[idx], idx)}
+</button>
+<br>`
   }
   return /*html*/`${speedList}
 </div>
@@ -294,8 +298,8 @@ function defineVideoController() {
           "click",
           (e) => {
             runAction(
-              e.target.dataset["action"],
-              getKeyBindings(e.target.dataset["action"]),
+              e.currentTarget.dataset["action"],
+              e.currentTarget.dataset["value"] || getKeyBindings(e.currentTarget.dataset["action"]),
               e
             );
             e.stopPropagation();
@@ -708,22 +712,22 @@ function changeSpeed(video, direction='') {
     log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
     if (playbackRate > rate) continue
     if (direction === '-') {
-      // Video min rate is 0.0625:
-      // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-      setSpeed(video, Math.max( speedValues[ Math.max(idx-1, 0) ], 0.0625 ));
+      setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
       break;
     } else if (direction === '+') {
       if (playbackRate === rate) idx += 1
       // if playbackRate < rate keep idx
-      // Maximum playback speed in Chrome is set to 16:
-      // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-      setSpeed(video, Math.min( speedValues[ Math.min(idx, speedValues.length-1) ], 16 ));
+      setSpeed(video, speedValues[ Math.min(idx, speedValues.length-1) ]);
       break;
     }
   }
 }
 function setSpeed(video, speed) {
-  speed = Number(speed).toFixed(7);
+  // Video min rate is 0.0625:
+  // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
+  // Maximum playback speed in Chrome is set to 16:
+  // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
+  speed = Number( Math.max(Math.min(speed,16),0.0625) ).toFixed(7);
   log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(
@@ -775,6 +779,12 @@ function runAction(action, value, e) {
         log("list speeds", 5);
         v.vsc.speedList.classList.toggle("show");
         v.vsc.btnListSpeeds.classList.toggle("on");
+        //TODO unshow when vsc-hidden
+      } else if (action === "jumpspeed") {
+        log("jump speed:"+value, 5);
+        v.vsc.speedList.classList.toggle("show");
+        v.vsc.btnListSpeeds.classList.toggle("on");
+        setSpeed(v, value)
         //TODO unshow when vsc-hidden
       } else if (action === "display") {
         log("Showing controller", 5);
