@@ -112,13 +112,13 @@ function formatSpeedIndicator(
 
 function buildSpeedList() {
   let speedList = /*html*/`<div id="speedList">
-<br>`
+`
   for (let idx = 0; idx<speedValues.length; idx++) {
     // const rate = speedValues[idx].toFixed(7)
     speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedValues[idx]}">
 ${formatSpeedIndicator( speedValues[idx], idx)}
 </button>
-<br>`
+`
   }
   return /*html*/`${speedList}
 </div>
@@ -250,8 +250,10 @@ function defineVideoController() {
     // are relative to offsetParent, so we adjust for that here. offsetParent
     // can be null if the video has `display: none` or is not yet in the DOM.
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
-    const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
-    const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
+    const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px"
+    const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px"
+    // prevent speedlist from betting behind video controlls
+    const height = (rect.height - 133) + "px"
 
     var wrapper = document.createElement("div");
     wrapper.classList.add("avs-controller");
@@ -260,34 +262,30 @@ function defineVideoController() {
 
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = /*html*/`
-        <style>
-          @import "${chrome.runtime.getURL("shadow.css")}";
-        </style>
-        <div id="controller"
-          style="top:${top};left:${left};opacity:${tc.settings.controllerOpacity}"
-        >
-          <div id="controllerTop">
-            <b data-action="drag" class="draggable">&equiv;</b>
-            <span id="speedDisplay">--</span>
-          </div>
-          <span id="controls">
-            <button data-action="rewind" class="rw">«</button>
-            <button data-action="slower">&minus;</button>
-            <button data-action="listspeeds" class="rw">&equiv;</button>
-            <button data-action="faster">&plus;</button>
-            <button data-action="advance" class="rw">»</button>
-          </span>${buildSpeedList()}
-        </div>
-      `;
+<style>
+  @import "${chrome.runtime.getURL("shadow.css")}";
+</style>
+<div id="controller"
+  style="top:${top};left:${left};max-height:${height};opacity:${tc.settings.controllerOpacity}"
+>
+    <div id="speedDisplay" data-action="drag">--</div>
+  <span id="controls">
+    <button data-action="rewind" class="rw">«</button>
+    <button data-action="slower">&minus;</button>
+    <button data-action="listspeeds" class="rw">&equiv;</button>
+    <button data-action="faster">&plus;</button>
+    <button data-action="advance" class="rw">»</button>
+  </span>${buildSpeedList()}
+</div>
+ `;
     shadow.innerHTML = shadowTemplate;
     shadow
-      .querySelector(".draggable")
+      .querySelector("[data-action='drag']")
       .addEventListener(
         "mousedown",
         (e) => {
-          // e.preventDefault();
-          runAction(e.target.dataset["action"], null, e);
-          // e.stopPropagation();
+          runAction("drag", null, e);
+          e.stopPropagation();
         },
         true
       );
@@ -746,7 +744,7 @@ function setSpeed(video, speed) {
 }
 
 function runAction(action, value, e) {
-  log("runAction Begin", 5);
+  log("Begin:"+action, 4);
   let mediaTags = tc.mediaElements;
   // Get the controller that was used if called from a button press event e
   if (e) {
@@ -822,7 +820,7 @@ function runAction(action, value, e) {
       }
     }
   });
-  log("runAction End", 5);
+  log("End", 5);
 }
 
 function pause(v) {

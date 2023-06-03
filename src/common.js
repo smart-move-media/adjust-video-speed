@@ -29,7 +29,7 @@ export let tcDefaults = {
       ['double', 2],
       ['blazing', 3],
     ],
-    pitch440: [
+    pitch: [
       ['-24', 0.2500000],
       ['-12', 0.5000000],
       ['-11', 0.5297315],

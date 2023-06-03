@@ -18,19 +18,21 @@
   margin: 10px 10px 10px 15px;
 
   cursor: default;
-  z-index: 9999999;
+  z-index: 999999999;
+  overflow: auto;
+  scrollbar-color: #21f32f;
 }
 #controller:hover {
   opacity: 0.7;
 }
-#controller:hover > .draggable {
+#controller:hover > [data-action='drag'] {
   margin-right: 0.8em;
 }
 
-.draggable {
+[data-action='drag'] {
   cursor: grab;
 }
-.draggable:active {
+[data-action='drag']:active {
   cursor: grabbing;
 }
 #controller.dragging {
@@ -38,6 +40,13 @@
   opacity: 0.7;
 }
 
+#speedList {
+  flex-direction: column;
+  align-content: flex-start;
+  gap: 2px;
+}
+
+/* display/hide */
 #controls,
 .hoverShow,
 #speedList {
@@ -46,9 +55,11 @@
 :host(:hover) #controls,
 /* :host(:hover) #speedList, */
 #controller.dragging #controls,
-#controller:hover .hoverShow,
-#controller:hover #speedList.show {
+#controller:hover .hoverShow {
   display: inline;
+}
+#controller:hover #speedList.show {
+  display: flex;
 }
 
 
@@ -65,7 +76,7 @@ button {
   padding: 3px 5px 3px 5px;
   line-height: 16px;
   border: 0px solid white;
-  margin: 0px 2px 2px 2px;
+  margin: 0px .3px 2px .3px;
   transition: background 0.2s, color 0.2s;
 }
 button:focus {
@@ -89,7 +100,7 @@ button.hideButton {
   margin-right: 2px;
 }
 #speedList > button {
-  min-width: 7em;
+  min-width: 5.7em;
   padding: 0 0.3em;
   line-height: 15px;
   margin: 2px 0;
@@ -101,8 +112,8 @@ button.hideButton {
   background: #21f32f;
 }
 
-#controllerTop {
-  margin: 2px 2px 1.5px 0;
+#speedDisplay {
+  margin: 0 1px 1px 1px;
 }
 b[data-action="drag"] {
   opacity: 1;
