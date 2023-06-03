@@ -153,8 +153,8 @@ var defineVideoController = function() {
   }).map((x) => []));
   [speedNames, speedValues] = unzip(speedSet);
   tc.videoController = function(target, parent) {
-    if (target.vsc) {
-      return target.vsc;
+    if (target.avs) {
+      return target.avs;
     }
     tc.mediaElements.push(target);
     this.video = target;
@@ -197,9 +197,9 @@ var defineVideoController = function() {
           log("mutation of A/V element", 5);
           var controller = this.div;
           if (!mutation.target.src && !mutation.target.currentSrc) {
-            controller.classList.add("vsc-nosource");
+            controller.classList.add("avs-nosource");
           } else {
-            controller.classList.remove("vsc-nosource");
+            controller.classList.remove("avs-nosource");
           }
         }
       });
@@ -212,7 +212,7 @@ var defineVideoController = function() {
     this.div.remove();
     this.video.removeEventListener("play", this.handlePlay);
     this.video.removeEventListener("seek", this.handleSeek);
-    delete this.video.vsc;
+    delete this.video.avs;
     let idx = tc.mediaElements.indexOf(this.video);
     if (idx != -1) {
       tc.mediaElements.splice(idx, 1);
@@ -227,11 +227,11 @@ var defineVideoController = function() {
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px";
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
     var wrapper = document2.createElement("div");
-    wrapper.classList.add("vsc-controller");
+    wrapper.classList.add("avs-controller");
     if (!this.video.currentSrc)
-      wrapper.classList.add("vsc-nosource");
+      wrapper.classList.add("avs-nosource");
     if (tc.settings.startHidden)
-      wrapper.classList.add("vsc-hidden");
+      wrapper.classList.add("avs-hidden");
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = `
         <style>
@@ -337,14 +337,14 @@ var refreshCoolDown = function() {
 };
 var setupListener = function() {
   function updateSpeedFromEvent(video, event) {
-    if (!video.vsc)
+    if (!video.avs)
       return;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate).toFixed(7);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.setHTML(formatSpeedIndicator(speed));
+    video.avs.speedIndicator.setHTML(formatSpeedIndicator(speed));
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -427,15 +427,15 @@ var initializeNow = function(document2) {
   log("Begin initializeNow", 5);
   if (!tc.settings.enabled)
     return;
-  if (!document2.body || document2.body.classList.contains("vsc-initialized")) {
+  if (!document2.body || document2.body.classList.contains("avs-initialized")) {
     return;
   }
   try {
     setupListener();
   } catch {
   }
-  document2.body.classList.add("vsc-initialized");
-  log("initializeNow: vsc-initialized added to document body", 5);
+  document2.body.classList.add("avs-initialized");
+  log("initializeNow: avs-initialized added to document body", 5);
   if (document2 === window.document) {
     defineVideoController();
   } else {
@@ -482,10 +482,10 @@ var initializeNow = function(document2) {
     }
     if (node.nodeName === "VIDEO" || node.nodeName === "AUDIO" && tc.settings.audioBoolean) {
       if (added) {
-        node.vsc = new tc.videoController(node, parent);
+        node.avs = new tc.videoController(node, parent);
       } else {
-        if (node.vsc) {
-          node.vsc.remove();
+        if (node.avs) {
+          node.avs.remove();
         }
       }
     } else if (node.children != null) {
@@ -521,10 +521,10 @@ var initializeNow = function(document2) {
               var flattenedNodes = getShadow(document2.body);
               var nodes = flattenedNodes.filter((x) => x.tagName == "VIDEO");
               for (let node of nodes) {
-                if (node.vsc && mutation.target.nodeName === "APPLE-TV-PLUS-PLAYER")
+                if (node.avs && mutation.target.nodeName === "APPLE-TV-PLUS-PLAYER")
                   continue;
-                if (node.vsc)
-                  node.vsc.remove();
+                if (node.avs)
+                  node.avs.remove();
                 checkForVideo(node, node.parentNode || mutation.target, true);
               }
             }
@@ -544,7 +544,7 @@ var initializeNow = function(document2) {
     var mediaTags = document2.querySelectorAll("video");
   }
   mediaTags.forEach(function(video) {
-    video.vsc = new tc.videoController(video);
+    video.avs = new tc.videoController(video);
   });
   var frameTags = document2.getElementsByTagName("iframe");
   Array.prototype.forEach.call(frameTags, function(frame) {
@@ -587,7 +587,7 @@ var setSpeed = function(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
-  video.vsc.speedIndicator.setHTML(formatSpeedIndicator(speed));
+  video.avs.speedIndicator.setHTML(formatSpeedIndicator(speed));
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -599,10 +599,10 @@ var runAction = function(action, value, e) {
     var targetController = e.target.getRootNode().host;
   }
   mediaTags.forEach(function(v) {
-    const controller = v.vsc.div;
+    const controller = v.avs.div;
     if (e && !(targetController == controller))
       return;
-    if (!v.classList.contains("vsc-cancelled")) {
+    if (!v.classList.contains("avs-cancelled")) {
       if (action === "rewind") {
         log("Rewind", 5);
         v.currentTime -= value;
@@ -617,24 +617,24 @@ var runAction = function(action, value, e) {
         changeSpeed(v, "-");
       } else if (action === "listspeeds") {
         log("list speeds", 5);
-        v.vsc.speedList.classList.toggle("show");
-        v.vsc.btnListSpeeds.classList.toggle("on");
+        v.avs.speedList.classList.toggle("show");
+        v.avs.btnListSpeeds.classList.toggle("on");
       } else if (action === "jumpspeed") {
         log("jump speed:" + value, 5);
-        v.vsc.speedList.classList.toggle("show");
-        v.vsc.btnListSpeeds.classList.toggle("on");
+        v.avs.speedList.classList.toggle("show");
+        v.avs.btnListSpeeds.classList.toggle("on");
         setSpeed(v, value);
       } else if (action === "display") {
         log("Showing controller", 5);
-        controller.classList.add("vsc-manual");
-        controller.classList.toggle("vsc-hidden");
+        controller.classList.add("avs-manual");
+        controller.classList.toggle("avs-hidden");
       } else if (action === "blink") {
         log("Showing controller momentarily", 5);
-        if (controller.classList.contains("vsc-hidden") || controller.blinkTimeOut !== undefined) {
+        if (controller.classList.contains("avs-hidden") || controller.blinkTimeOut !== undefined) {
           clearTimeout(controller.blinkTimeOut);
-          controller.classList.remove("vsc-hidden");
+          controller.classList.remove("avs-hidden");
           controller.blinkTimeOut = setTimeout(() => {
-            controller.classList.add("vsc-hidden");
+            controller.classList.add("avs-hidden");
             controller.blinkTimeOut = undefined;
           }, value ? value : 1000);
         }
@@ -667,16 +667,16 @@ var muted = function(v) {
 };
 var setMark = function(v) {
   log("Adding marker", 5);
-  v.vsc.mark = v.currentTime;
+  v.avs.mark = v.currentTime;
 };
 var jumpToMark = function(v) {
   log("Recalling marker", 5);
-  if (v.vsc.mark && typeof v.vsc.mark === "number") {
-    v.currentTime = v.vsc.mark;
+  if (v.avs.mark && typeof v.avs.mark === "number") {
+    v.currentTime = v.avs.mark;
   }
 };
 var handleDrag = function(video, e) {
-  const controller = video.vsc.div;
+  const controller = video.avs.div;
   const shadowController = controller.shadowRoot.querySelector("#controller");
   var parentElement = controller.parentElement;
   while (parentElement.parentNode && parentElement.parentNode.offsetHeight === parentElement.offsetHeight && parentElement.parentNode.offsetWidth === parentElement.offsetWidth) {

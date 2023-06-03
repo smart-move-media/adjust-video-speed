@@ -149,10 +149,10 @@ function defineVideoController() {
   //   speedIndicator = DOM element in the Controller of the speed indicator
 
   // added to AUDIO / VIDEO DOM elements
-  //    vsc = reference to the videoController
+  //    avs = reference to the videoController
   tc.videoController = function (target, parent) {
-    if (target.vsc) {
-      return target.vsc;
+    if (target.avs) {
+      return target.avs;
     }
 
     tc.mediaElements.push(target);
@@ -218,9 +218,9 @@ function defineVideoController() {
           log("mutation of A/V element", 5);
           var controller = this.div;
           if (!mutation.target.src && !mutation.target.currentSrc) {
-            controller.classList.add("vsc-nosource");
+            controller.classList.add("avs-nosource");
           } else {
-            controller.classList.remove("vsc-nosource");
+            controller.classList.remove("avs-nosource");
           }
         }
       });
@@ -234,7 +234,7 @@ function defineVideoController() {
     this.div.remove();
     this.video.removeEventListener("play", this.handlePlay);
     this.video.removeEventListener("seek", this.handleSeek);
-    delete this.video.vsc;
+    delete this.video.avs;
     let idx = tc.mediaElements.indexOf(this.video);
     if (idx != -1) {
       tc.mediaElements.splice(idx, 1);
@@ -254,9 +254,9 @@ function defineVideoController() {
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px";
 
     var wrapper = document.createElement("div");
-    wrapper.classList.add("vsc-controller");
-    if (!this.video.currentSrc) wrapper.classList.add("vsc-nosource");
-    if (tc.settings.startHidden) wrapper.classList.add("vsc-hidden");
+    wrapper.classList.add("avs-controller");
+    if (!this.video.currentSrc) wrapper.classList.add("avs-nosource");
+    if (tc.settings.startHidden) wrapper.classList.add("avs-hidden");
 
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = /*html*/`
@@ -415,7 +415,7 @@ function setupListener() {
   function updateSpeedFromEvent(video, event) {
     // It's possible to get a rate change on a VIDEO/AUDIO that doesn't have
     // a video controller attached to it.  If we do, ignore it.
-    if (!video.vsc)
+    if (!video.avs)
       return;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate).toFixed(7);
@@ -424,7 +424,7 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    video.vsc.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+    video.avs.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -521,7 +521,7 @@ function initializeNow(document) {
   log("Begin initializeNow", 5);
   if (!tc.settings.enabled) return;
   // enforce init-once due to redundant callers
-  if (!document.body || document.body.classList.contains("vsc-initialized")) {
+  if (!document.body || document.body.classList.contains("avs-initialized")) {
     return;
   }
   try {
@@ -529,8 +529,8 @@ function initializeNow(document) {
   } catch {
     // no operation
   }
-  document.body.classList.add("vsc-initialized");
-  log("initializeNow: vsc-initialized added to document body", 5);
+  document.body.classList.add("avs-initialized");
+  log("initializeNow: avs-initialized added to document body", 5);
 
   if (document === window.document) {
     defineVideoController();
@@ -576,7 +576,7 @@ function initializeNow(document) {
           return false;
         }
 
-        // Ignore keydown event if typing in a page without vsc
+        // Ignore keydown event if typing in a page without avs
         if (!tc.mediaElements.length) {
           return false;
         }
@@ -607,10 +607,10 @@ function initializeNow(document) {
       (node.nodeName === "AUDIO" && tc.settings.audioBoolean)
     ) {
       if (added) {
-        node.vsc = new tc.videoController(node, parent);
+        node.avs = new tc.videoController(node, parent);
       } else {
-        if (node.vsc) {
-          node.vsc.remove();
+        if (node.avs) {
+          node.avs.remove();
         }
       }
     } else if (node.children != undefined) {
@@ -655,11 +655,11 @@ function initializeNow(document) {
                   (x) => x.tagName == "VIDEO"
                 );
                 for (let node of nodes) {
-                  // only add vsc the first time for the apple-tv case (the attribute change is triggered every time you click the vsc)
-                  if (node.vsc && mutation.target.nodeName === 'APPLE-TV-PLUS-PLAYER')
+                  // only add avs the first time for the apple-tv case (the attribute change is triggered every time you click the avs)
+                  if (node.avs && mutation.target.nodeName === 'APPLE-TV-PLUS-PLAYER')
                     continue;
-                  if (node.vsc)
-                    node.vsc.remove();
+                  if (node.avs)
+                    node.avs.remove();
                   checkForVideo(node, node.parentNode || mutation.target, true);
                 }
               }
@@ -683,7 +683,7 @@ function initializeNow(document) {
   }
 
   mediaTags.forEach(function (video) {
-    video.vsc = new tc.videoController(video);
+    video.avs = new tc.videoController(video);
   });
 
   var frameTags = document.getElementsByTagName("iframe");
@@ -739,7 +739,7 @@ function setSpeed(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`)
   }
-  video.vsc.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+  video.avs.speedIndicator.setHTML( formatSpeedIndicator(speed) );
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
@@ -754,12 +754,12 @@ function runAction(action, value, e) {
   }
 
   mediaTags.forEach(function (v) {
-    const controller = v.vsc.div;
+    const controller = v.avs.div;
     // Don't change video speed if the video has a different controller
     if (e && !(targetController == controller)) return;
     // showController(controller);
 
-    if (!v.classList.contains("vsc-cancelled")) {
+    if (!v.classList.contains("avs-cancelled")) {
       if (action === "rewind") {
         log("Rewind", 5);
         v.currentTime -= value;
@@ -777,31 +777,31 @@ function runAction(action, value, e) {
       //   resetSpeed(v, 1.0);
       } else if (action === "listspeeds") {
         log("list speeds", 5);
-        v.vsc.speedList.classList.toggle("show");
-        v.vsc.btnListSpeeds.classList.toggle("on");
-        //TODO unshow when vsc-hidden
+        v.avs.speedList.classList.toggle("show");
+        v.avs.btnListSpeeds.classList.toggle("on");
+        //TODO unshow when avs-hidden
       } else if (action === "jumpspeed") {
         log("jump speed:"+value, 5);
-        v.vsc.speedList.classList.toggle("show");
-        v.vsc.btnListSpeeds.classList.toggle("on");
+        v.avs.speedList.classList.toggle("show");
+        v.avs.btnListSpeeds.classList.toggle("on");
         setSpeed(v, value)
-        //TODO unshow when vsc-hidden
+        //TODO unshow when avs-hidden
       } else if (action === "display") {
         log("Showing controller", 5);
-        controller.classList.add("vsc-manual");
-        controller.classList.toggle("vsc-hidden");
+        controller.classList.add("avs-manual");
+        controller.classList.toggle("avs-hidden");
       } else if (action === "blink") {
         log("Showing controller momentarily", 5);
-        // if vsc is hidden, show it briefly to give the use visual feedback that the action is excuted.
+        // if avs is hidden, show it briefly to give the use visual feedback that the action is excuted.
         if (
-          controller.classList.contains("vsc-hidden") ||
+          controller.classList.contains("avs-hidden") ||
           controller.blinkTimeOut !== undefined
         ) {
           clearTimeout(controller.blinkTimeOut);
-          controller.classList.remove("vsc-hidden");
+          controller.classList.remove("avs-hidden");
           controller.blinkTimeOut = setTimeout(
             () => {
-              controller.classList.add("vsc-hidden");
+              controller.classList.add("avs-hidden");
               controller.blinkTimeOut = undefined;
             },
             value ? value : 1000
@@ -862,17 +862,17 @@ function muted(v) {
 
 function setMark(v) {
   log("Adding marker", 5);
-  v.vsc.mark = v.currentTime;
+  v.avs.mark = v.currentTime;
 }
 function jumpToMark(v) {
   log("Recalling marker", 5);
-  if (v.vsc.mark && typeof v.vsc.mark === "number") {
-    v.currentTime = v.vsc.mark;
+  if (v.avs.mark && typeof v.avs.mark === "number") {
+    v.currentTime = v.avs.mark;
   }
 }
 
 function handleDrag(video, e) {
-  const controller = video.vsc.div;
+  const controller = video.avs.div;
   const shadowController = controller.shadowRoot.querySelector("#controller");
 
   // Find nearest parent of same size as video parent.
