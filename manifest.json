@@ -1,7 +1,7 @@
 {
   "name": "Adjust Video Speed",
   "short_name": "adjustvideospeed",
-  "version": "0.8.13",
+  "version": "0.8.14",
   "manifest_version": 3,
   "minimum_chrome_version": "89",
   "description": "Change audio/video playback speeds with shortcuts",

@@ -11,8 +11,25 @@ last point to listen to it a few more times.
 
 ![Player](https://cloud.githubusercontent.com/assets/2400185/24076745/5723e6ae-0c41-11e7-820c-1d8e814a2888.png)
 
-~~~## _[Install Chrome Extension](https://chrome.google.com/webstore/detail/video-speed-controller/nffaoalbilbmmfgbnbgppjihopabppdk)
+~~~## _[Install Chrome Extension](https://github.com/smart-move-media/adjust-video-speed)
 ~~~
+
+**Not in Chrome Store yet!**
+
+### Manual Installation
+
+  1. Go to repo at [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
+  2. Clone repo
+    * If you don't know how to clone:
+    * Click on [<> Code] button in top-middle
+    * bottom of dropdown, choose "Download ZIP"
+  3. In Chrome/Brave/Edge open extentions at [brave://extensions/](brave://extensions/)
+  4. Turn on **Developer mode** switch
+  5. ( Load unpacked ) button
+  6. open where you cloned/unpacked zip
+  
+## Usage
+
 \*\* Once the extension is installed simply navigate to any page that offers
 HTML5 video ([example](http://www.youtube.com/watch?v=E9FxNzv1Tr8)), and you'll
 see a speed indicator in top left corner. Hover over the indicator to reveal the
@@ -68,15 +85,7 @@ studies report that after being exposed to accelerated playback,
 if they are forced to return to normal rate of presentation.
 
 **Video controls are not showing up?** This extension is only compatible
-with HTML5 video. If you don't see the controls showing up, chances are you are
-viewing a Flash video. If you want to confirm, try right-clicking on the video
-and inspect the menu: if it mentions flash, then that's the issue. That said,
-most sites will fallback to HTML5 if they detect that Flash it not available.
-You can try manually disabling Flash plugin in Chrome:
-
-- In a new tab, navigate to `chrome://settings/content/flash`
-- Disable "Allow sites to run Flash"
-- Restart your browser and try playing your video again
+with HTML5 video.
 
 **The speed controls are not showing up for local videos?** To enable playback
 of local media (e.g. File > Open File), you need to grant additional permissions

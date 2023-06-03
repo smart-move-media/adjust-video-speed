@@ -1,6 +1,6 @@
 # Contributing
 
-Video Speed Controller is an open source project licensed under the MIT license
+"Adjust Video Speed" is an open source project licensed under the MIT license
 with many contributors. Contributions are welcome, and greatly appreciated.
 
 If you would like to help, getting started is easy.
@@ -12,26 +12,19 @@ If you would like to help, getting started is easy.
 3. Once the fork is ready, clone to your local PC
 
    ```sh
-   $ git clone https://github.com/<USERNAME>/videospeed.git
-   Cloning into 'videospeed'...
-    remote: Enumerating objects: 10, done.
-    remote: Counting objects: 100% (10/10), done.
-    remote: Compressing objects: 100% (9/9), done.
-    remote: Total 877 (delta 3), reused 2 (delta 1), pack-reused 867
-    Receiving objects: 100% (877/877), 317.65 KiB | 2.17 MiB/s, done.
-    Resolving deltas: 100% (543/543), done.
+   $ git clone https://github.com/smart-move-media/adjust-video-speed
+   Cloning into 'adjust-video-speed'...
    ```
 
 4. Create a branch for your changes
 
    ```sh
-    $ cd videospeed
-    videospeed$ git checkout -b bugfix/1-fix-double-click
+    $ cd adjust-video-speed
+    $ git checkout -b bugfix/1-fix-double-click
     M   .github/workflows/chrome-store-upload.yaml
     M   README.md
     M   options.js
     Switched to a new branch 'bugfix/1-fix-double-click'
-    videospeed$
    ```
 
 5. Open the code in your favorite code editor, make your changes
@@ -48,7 +41,7 @@ If you would like to help, getting started is easy.
 6. Next, open Chrome/Brave/Chromium and enable developer mode via
    `Settings > Extensions > Manage Extensions` and toggle `Developer mode` in
    the top-right corner.
-7. Click `Load unpacked` and browse to the folder you cloned videospeed to.
+7. Click `Load unpacked` and browse to the folder you cloned adjust-video-speed to.
 8. Try out your changes, make sure they work as expected
 9. Commit and push your changes to github
 
