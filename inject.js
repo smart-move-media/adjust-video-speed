@@ -149,14 +149,29 @@ ${formatSpeedIndicator(speedValues[idx], idx)}
 </div>
 `;
 };
-var defineVideoController = function() {
-  speedSetNames = Object.keys(tc.settings.speedSets);
-  log(speedSetNames, 2);
+var buidSpeedArrays = function() {
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
   const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
     length: Math.max(...arr.map((x) => x.length))
   }).map((x) => []));
   [speedNames, speedValues] = unzip(speedSet);
+};
+var setStoredSpeed = function(target) {
+  storedSpeed = tc.settings.playersSpeed[target.currentSrc];
+  if (tc.settings.rememberSpeed) {
+    storedSpeed = tc.settings.lastSpeed;
+    log(`Recalled stored speed due to rememberSpeed being enabled: ${storedSpeed}`, 5);
+  } else {
+    if (!storedSpeed) {
+      log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
+      storedSpeed = 1;
+    }
+    setKeyBindings("reset", getKeyBindings("fast"));
+  }
+};
+var defineVideoController = function() {
+  speedSetNames = Object.keys(tc.settings.speedSets);
+  buidSpeedArrays();
   tc.videoController = function(target, parent) {
     if (target.avs) {
       return target.avs;
@@ -164,33 +179,12 @@ var defineVideoController = function() {
     tc.mediaElements.push(target);
     this.video = target;
     this.parent = target.parentElement || parent;
-    storedSpeed = tc.settings.playersSpeed[target.currentSrc];
-    if (!tc.settings.rememberSpeed) {
-      if (!storedSpeed) {
-        log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
-        storedSpeed = 1;
-      }
-      setKeyBindings("reset", getKeyBindings("fast"));
-    } else {
-      storedSpeed = tc.settings.lastSpeed;
-      log(`Recalled stored speed due to rememberSpeed being enabled: ${storedSpeed}`, 5);
-    }
+    setStoredSpeed(target);
     log("Explicitly setting playbackRate to: " + storedSpeed, 5);
     target.playbackRate = storedSpeed;
     this.div = this.initializeControls();
-    var mediaEventAction = function(event) {
-      storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
-      if (!tc.settings.rememberSpeed) {
-        if (!storedSpeed) {
-          log("Setting stored speed to 1.0 (rememberSpeed not enabled)", 4);
-          storedSpeed = 1;
-        }
-        log("Setting reset keybinding to fast", 5);
-        setKeyBindings("reset", getKeyBindings("fast"));
-      } else {
-        log("Recalling stored speed; rememberSpeed is enabled_", 5);
-        storedSpeed = tc.settings.lastSpeed;
-      }
+    let mediaEventAction = function(event) {
+      setStoredSpeed(event.target);
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
       setSpeed(event.target, storedSpeed);
     };
@@ -750,6 +744,7 @@ var speedSet;
 var speedSetNames;
 var speedNames;
 var speedValues = [];
+var storedSpeed = 1;
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)
     log(`Warning a field we sync: ${field} not found on our tc.settings class likely error`, 3);

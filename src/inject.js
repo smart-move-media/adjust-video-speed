@@ -16,6 +16,7 @@ var tc = {
   mediaElements: []
 };
 let speedSet, speedSetNames, speedNames, speedValues = []
+let storedSpeed = 1.0
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -127,11 +128,7 @@ ${formatSpeedIndicator( speedValues[idx], idx)}
 </div>
 `
 }
-
-function defineVideoController() {
-  // refresh global settings var
-  speedSetNames = Object.keys(tc.settings.speedSets)
-log(speedSetNames, 2)
+function buidSpeedArrays() {
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
@@ -143,6 +140,24 @@ log(speedSetNames, 2)
       }).map(x => [])
     );
   [speedNames, speedValues] = unzip(speedSet)
+}
+function setStoredSpeed(target) {
+  storedSpeed = tc.settings.playersSpeed[target.currentSrc];
+  if (tc.settings.rememberSpeed) {
+    storedSpeed = tc.settings.lastSpeed;
+    log(`Recalled stored speed due to rememberSpeed being enabled: ${storedSpeed}`, 5);
+  } else {
+    if (!storedSpeed) {
+      log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
+      storedSpeed = 1.0;
+    }
+    setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
+  }
+}
+function defineVideoController() {
+  // refresh global settings var
+  speedSetNames = Object.keys(tc.settings.speedSets)
+  buidSpeedArrays()
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -161,40 +176,17 @@ log(speedSetNames, 2)
     }
 
     tc.mediaElements.push(target);
-
     this.video = target;
     this.parent = target.parentElement || parent;
-    storedSpeed = tc.settings.playersSpeed[target.currentSrc];
-    if (!tc.settings.rememberSpeed) {
-      if (!storedSpeed) {
-        log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
-        storedSpeed = 1.0;
-      }
-      setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
-    } else {
-      storedSpeed = tc.settings.lastSpeed;
-      log(`Recalled stored speed due to rememberSpeed being enabled: ${storedSpeed}`, 5);
-    }
 
+    setStoredSpeed(target)
     log("Explicitly setting playbackRate to: " + storedSpeed, 5);
     target.playbackRate = storedSpeed;
 
     this.div = this.initializeControls();
 
-    var mediaEventAction = function (event) {
-      storedSpeed = tc.settings.playersSpeed[event.target.currentSrc];
-      if (!tc.settings.rememberSpeed) {
-        if (!storedSpeed) {
-          log("Setting stored speed to 1.0 (rememberSpeed not enabled)", 4);
-          storedSpeed = 1.0;
-        }
-        // resetSpeed isn't really a reset, it's a toggle
-        log("Setting reset keybinding to fast", 5);
-        setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
-      } else {
-        log("Recalling stored speed; rememberSpeed is enabled_", 5);
-        storedSpeed = tc.settings.lastSpeed;
-      }
+    let mediaEventAction = function (event) {
+      setStoredSpeed(event.target)
       // TODO: Check if explicitly setting the playback rate to 1.0 is
       // necessary when rememberSpeed is disabled (this may accidentally
       // override a website's intentional initial speed setting interfering
@@ -202,12 +194,10 @@ log(speedSetNames, 2)
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
       setSpeed(event.target, storedSpeed);
     };
-
     target.addEventListener(
       "play",
       (this.handlePlay = mediaEventAction.bind(this))
     );
-
     target.addEventListener(
       "seeked",
       (this.handleSeek = mediaEventAction.bind(this))

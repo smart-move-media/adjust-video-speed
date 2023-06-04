@@ -50,6 +50,7 @@
 #speedSetChosen {
   flex-grow: 1;
   text-align: center;
+  font-weight: bold;
 }
 
 /* display/hide */
