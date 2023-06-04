@@ -113,7 +113,7 @@ function formatSpeedIndicator(
 function buildSpeedList() {
   let speedList = /*html*/`<div id="speedList">
   <div id="speedSetNames">
-    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNext" class="rw">></button>
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
 `
   for (let idx = 0; idx<speedValues.length; idx++) {
@@ -130,6 +130,8 @@ ${formatSpeedIndicator( speedValues[idx], idx)}
 
 function defineVideoController() {
   // refresh global settings var
+  speedSetNames = Object.keys(tc.settings.speedSets)
+log(speedSetNames, 2)
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
@@ -706,6 +708,17 @@ function initializeNow(document) {
 
 }
 
+function switchSpeedSet(step=0) { //0 acts like refresh speedbuttons
+  log(`(${step})`, 4)
+  const speedSetCount = speedSetNames.length - 1
+  let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step
+  idx = (idx<0) ? speedSetCount : (idx>speedSetCount) ? 0 : idx;
+  const ret = speedSetNames[idx]
+  tc.settings.speedSetChosen = ret
+  log(idx +':'+ ret, 4)
+  return ret
+}
+
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
   log(`(${playbackRate})`, 4)
@@ -729,7 +742,7 @@ function setSpeed(video, speed) {
   // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
   // Maximum playback speed in Chrome is set to 16:
   // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-  speed = Number( Math.max(Math.min(speed,16),0.0625) ).toFixed(7);
+  speed = Math.max(Math.min(speed,16),0.0625).toFixed(7);
   log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(
@@ -787,8 +800,16 @@ function runAction(action, value, e) {
         log("list speeds", 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
-        break
         //TODO unshow when avs-hidden
+        break
+      case "setNextSet":
+        log("setPrevSet", 5);
+        v.avs.speedSetChosen.textContent = switchSpeedSet(1)
+        break
+      case "setPrevSet":
+        log("setPrevSet", 5);
+        v.avs.speedSetChosen.textContent = switchSpeedSet(-1)
+        break
       case "jumpspeed":
         log("jump speed:"+value, 5);
         v.avs.speedList.classList.toggle("show");

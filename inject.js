@@ -136,7 +136,7 @@ var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => 
 var buildSpeedList = function() {
   let speedList = `<div id="speedList">
   <div id="speedSetNames">
-    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNext" class="rw">></button>
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
 `;
   for (let idx = 0;idx < speedValues.length; idx++) {
@@ -150,6 +150,8 @@ ${formatSpeedIndicator(speedValues[idx], idx)}
 `;
 };
 var defineVideoController = function() {
+  speedSetNames = Object.keys(tc.settings.speedSets);
+  log(speedSetNames, 2);
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
   const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
     length: Math.max(...arr.map((x) => x.length))
@@ -560,6 +562,16 @@ var initializeNow = function(document2) {
   });
   log("End initializeNow", 5);
 };
+var switchSpeedSet = function(step = 0) {
+  log(`(${step})`, 4);
+  const speedSetCount = speedSetNames.length - 1;
+  let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step;
+  idx = idx < 0 ? speedSetCount : idx > speedSetCount ? 0 : idx;
+  const ret = speedSetNames[idx];
+  tc.settings.speedSetChosen = ret;
+  log(idx + ":" + ret, 4);
+  return ret;
+};
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
@@ -580,7 +592,7 @@ var changeSpeed = function(video, direction = "") {
   }
 };
 var setSpeed = function(video, speed) {
-  speed = Number(Math.max(Math.min(speed, 16), 0.0625)).toFixed(7);
+  speed = Math.max(Math.min(speed, 16), 0.0625).toFixed(7);
   log(" started: " + speed, 5);
   if (tc.settings.forceLastSavedSpeed) {
     video.dispatchEvent(new CustomEvent("ratechange", {
@@ -628,6 +640,14 @@ var runAction = function(action, value, e) {
         log("list speeds", 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
+        break;
+      case "setNextSet":
+        log("setPrevSet", 5);
+        v.avs.speedSetChosen.textContent = switchSpeedSet(1);
+        break;
+      case "setPrevSet":
+        log("setPrevSet", 5);
+        v.avs.speedSetChosen.textContent = switchSpeedSet(-1);
         break;
       case "jumpspeed":
         log("jump speed:" + value, 5);
@@ -727,6 +747,7 @@ var tc = {
   mediaElements: []
 };
 var speedSet;
+var speedSetNames;
 var speedNames;
 var speedValues = [];
 for (let field of SettingFieldsSynced) {
