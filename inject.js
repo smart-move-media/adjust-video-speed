@@ -135,6 +135,9 @@ var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => 
 };
 var buildSpeedList = function() {
   let speedList = `<div id="speedList">
+  <div id="speedSetNames">
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNext" class="rw">></button>
+  </div>
 `;
   for (let idx = 0;idx < speedValues.length; idx++) {
     speedList += `<button data-action="jumpspeed" data-value="${speedValues[idx]}">
@@ -241,9 +244,7 @@ var defineVideoController = function() {
 <div id="controller"
   style="top:${top};left:${left};max-height:${height};opacity:${tc.settings.controllerOpacity}"
 >
-  <div id="controllerTop">
     <div id="speedDisplay" data-action="drag">--</div>
-  </div>
   <span id="controls">
     <button data-action="rewind" class="rw">\xAB</button>
     <button data-action="slower">&minus;</button>
@@ -255,7 +256,6 @@ var defineVideoController = function() {
  `;
     shadow.innerHTML = shadowTemplate;
     shadow.querySelector("[data-action='drag']").addEventListener("mousedown", (e) => {
-      log("shadow trigger");
       runAction("drag", null, e);
       e.stopPropagation();
     }, true);
@@ -270,6 +270,7 @@ var defineVideoController = function() {
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML(formatSpeedIndicator(speed));
     this.speedList = shadow.querySelector("#speedList");
+    this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.btnListSpeeds = shadow.querySelector("[data-action='listspeeds']");
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
@@ -604,53 +605,58 @@ var runAction = function(action, value, e) {
     const controller = v.avs.div;
     if (e && !(targetController == controller))
       return;
-    if (!v.classList.contains("avs-cancelled")) {
-      if (action === "rewind") {
+    if (v.classList.contains("avs-cancelled"))
+      return;
+    switch (action) {
+      case "rewind":
         log("Rewind", 5);
         v.currentTime -= value;
-      } else if (action === "advance") {
+        break;
+      case "advance":
         log("Fast forward", 5);
         v.currentTime += value;
-      } else if (action === "faster") {
+        break;
+      case "faster":
         log("Increase speed", 5);
         changeSpeed(v, "+");
-      } else if (action === "slower") {
+        break;
+      case "slower":
         log("Decrease speed", 5);
         changeSpeed(v, "-");
-      } else if (action === "listspeeds") {
+        break;
+      case "listspeeds":
         log("list speeds", 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
-      } else if (action === "jumpspeed") {
+        break;
+      case "jumpspeed":
         log("jump speed:" + value, 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
         setSpeed(v, value);
-      } else if (action === "display") {
+        break;
+      case "display":
         log("Showing controller", 5);
         controller.classList.add("avs-manual");
         controller.classList.toggle("avs-hidden");
-      } else if (action === "blink") {
-        log("Showing controller momentarily", 5);
-        if (controller.classList.contains("avs-hidden") || controller.blinkTimeOut !== undefined) {
-          clearTimeout(controller.blinkTimeOut);
-          controller.classList.remove("avs-hidden");
-          controller.blinkTimeOut = setTimeout(() => {
-            controller.classList.add("avs-hidden");
-            controller.blinkTimeOut = undefined;
-          }, value ? value : 1000);
-        }
-      } else if (action === "drag") {
+        break;
+      case "drag":
         handleDrag(v, e);
-      } else if (action === "pause") {
+        break;
+      case "pause":
         pause(v);
-      } else if (action === "muted") {
+        break;
+      case "muted":
         muted(v);
-      } else if (action === "mark") {
+        break;
+      case "mark":
         setMark(v);
-      } else if (action === "jump") {
+        break;
+      case "jump":
         jumpToMark(v);
-      }
+        break;
+      default:
+        log("unkonwn action", 3);
     }
   });
   log("End", 5);

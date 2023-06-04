@@ -15,7 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSet, speedNames, speedValues = []
+let speedSet, speedSetNames, speedNames, speedValues = []
 
 for (let field of SettingFieldsSynced){
   if (tcDefaults[field] === undefined)
@@ -52,7 +52,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     chrome.storage.sync.set(toSet);
   }
   
-  for (let field of SettingFieldsSynced){
+  for (let field of SettingFieldsSynced) {
     let origType = typeof(tcDefaults[field]);
     switch (origType){
         case "string":
@@ -112,6 +112,9 @@ function formatSpeedIndicator(
 
 function buildSpeedList() {
   let speedList = /*html*/`<div id="speedList">
+  <div id="speedSetNames">
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNext" class="rw">></button>
+  </div>
 `
   for (let idx = 0; idx<speedValues.length; idx++) {
     // const rate = speedValues[idx].toFixed(7)
@@ -315,6 +318,7 @@ function defineVideoController() {
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     this.speedList = shadow.querySelector("#speedList");
+    this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.btnListSpeeds = shadow.querySelector("[data-action='listspeeds']");
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
@@ -756,70 +760,87 @@ function runAction(action, value, e) {
     // Don't change video speed if the video has a different controller
     if (e && !(targetController == controller)) return;
     // showController(controller);
-
-    if (!v.classList.contains("avs-cancelled")) {
-      if (action === "rewind") {
+    if (v.classList.contains("avs-cancelled")) return
+    
+    switch (action){
+      case "rewind":
         log("Rewind", 5);
         v.currentTime -= value;
-      } else if (action === "advance") {
+        break
+      case "advance":
         log("Fast forward", 5);
         v.currentTime += value;
-      } else if (action === "faster") {
+        break
+      case "faster":
         log("Increase speed", 5);
         changeSpeed(v, '+')
-      } else if (action === "slower") {
+        break
+      case "slower":
         log("Decrease speed", 5);
         changeSpeed(v, '-')
-      // } else if (action === "reset") {
+        break
+      // case "reset":
       //   log("Reset speed", 5);
       //   resetSpeed(v, 1.0);
-      } else if (action === "listspeeds") {
+      //   break
+      case "listspeeds":
         log("list speeds", 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
+        break
         //TODO unshow when avs-hidden
-      } else if (action === "jumpspeed") {
+      case "jumpspeed":
         log("jump speed:"+value, 5);
         v.avs.speedList.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
         setSpeed(v, value)
+        break
         //TODO unshow when avs-hidden
-      } else if (action === "display") {
+      case "display":
         log("Showing controller", 5);
         controller.classList.add("avs-manual");
         controller.classList.toggle("avs-hidden");
-      } else if (action === "blink") {
-        log("Showing controller momentarily", 5);
-        // if avs is hidden, show it briefly to give the use visual feedback that the action is excuted.
-        if (
-          controller.classList.contains("avs-hidden") ||
-          controller.blinkTimeOut !== undefined
-        ) {
-          clearTimeout(controller.blinkTimeOut);
-          controller.classList.remove("avs-hidden");
-          controller.blinkTimeOut = setTimeout(
-            () => {
-              controller.classList.add("avs-hidden");
-              controller.blinkTimeOut = undefined;
-            },
-            value ? value : 1000
-          );
-        }
-      } else if (action === "drag") {
+        break
+      // case "blink":
+      //   log("Showing controller momentarily", 5);
+      //   // if avs is hidden, show it briefly to give the use visual feedback that the action is excuted.
+      //   if (
+      //     controller.classList.contains("avs-hidden") ||
+      //     controller.blinkTimeOut !== undefined
+      //   ) {
+      //     clearTimeout(controller.blinkTimeOut);
+      //     controller.classList.remove("avs-hidden");
+      //     controller.blinkTimeOut = setTimeout(
+      //       () => {
+      //         controller.classList.add("avs-hidden");
+      //         controller.blinkTimeOut = undefined;
+      //       },
+      //       value ? value : 1000
+      //     );
+      //   }
+      //   break
+      case "drag":
         handleDrag(v, e);
-      // } else if (action === "fast") {
+        break
+      // case "fast":
       //   resetSpeed(v, value);
-      } else if (action === "pause") {
+      //   break
+      case "pause":
         pause(v);
-      } else if (action === "muted") {
+        break
+      case "muted":
         muted(v);
-      } else if (action === "mark") {
+        break
+      case "mark":
         setMark(v);
-      } else if (action === "jump") {
+        break
+      case "jump":
         jumpToMark(v);
+        break
+      default:
+        log('unkonwn action', 3)
       }
-    }
-  });
+    });
   log("End", 5);
 }
 
