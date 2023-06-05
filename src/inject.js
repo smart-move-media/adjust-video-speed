@@ -111,12 +111,17 @@ function formatSpeedIndicator(
   })
 }
 
-function buildSpeedList() {
-  let speedList = /*html*/`<div id="speedList">
+function buildSpeedDropdown() {
+  return /*html*/`<div id="speedDropdown">
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
+  <div id="speedList">${buildSpeedList()}</div>
+</div>
 `
+}
+function buildSpeedList() {
+  let speedList = ``
   for (let idx = 0; idx<speedValues.length; idx++) {
     // const rate = speedValues[idx].toFixed(7)
     speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedValues[idx]}">
@@ -124,11 +129,10 @@ ${formatSpeedIndicator( speedValues[idx], idx)}
 </button>
 `
   }
-  return /*html*/`${speedList}
-</div>
-`
+  return speedList
 }
-function buidSpeedArrays() {
+
+function buildSpeedArrays() {
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
   speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
@@ -157,7 +161,7 @@ function setStoredSpeed(target) {
 function defineVideoController() {
   // refresh global settings var
   speedSetNames = Object.keys(tc.settings.speedSets)
-  buidSpeedArrays()
+  buildSpeedArrays()
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -247,7 +251,7 @@ function defineVideoController() {
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px"
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px"
-    // prevent speedlist from betting behind video controlls
+    // prevent speedDropdown from hidding behind video controlls
     const height = (rect.height - 133) + "px"
 
     var wrapper = document.createElement("div");
@@ -270,7 +274,7 @@ function defineVideoController() {
     <button data-action="listspeeds" class="rw">&equiv;</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">»</button>
-  </span>${buildSpeedList()}
+  </span>${buildSpeedDropdown()}
 </div>
  `;
     shadow.innerHTML = shadowTemplate;
@@ -309,8 +313,9 @@ function defineVideoController() {
 
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
-    this.speedList = shadow.querySelector("#speedList");
+    this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
+    this.speedList = shadow.querySelector("#speedList");
     this.btnListSpeeds = shadow.querySelector("[data-action='listspeeds']");
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
@@ -698,15 +703,17 @@ function initializeNow(document) {
 
 }
 
-function switchSpeedSet(step=0) { //0 acts like refresh speedbuttons
+function switchSpeedSet(video, step=0) { //0 acts like refresh speedbuttons
   log(`(${step})`, 4)
   const speedSetCount = speedSetNames.length - 1
   let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step
   idx = (idx<0) ? speedSetCount : (idx>speedSetCount) ? 0 : idx;
   const ret = speedSetNames[idx]
   tc.settings.speedSetChosen = ret
+  buildSpeedArrays()
   log(idx +':'+ ret, 4)
-  return ret
+  video.avs.speedSetChosen.textContent = ret
+  video.avs.speedList.innerHTML = buildSpeedList()
 }
 
 function changeSpeed(video, direction='') {
@@ -788,21 +795,21 @@ function runAction(action, value, e) {
       //   break
       case "listspeeds":
         log("list speeds", 5);
-        v.avs.speedList.classList.toggle("show");
+        v.avs.speedDropdown.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
         //TODO unshow when avs-hidden
         break
       case "setNextSet":
         log("setPrevSet", 5);
-        v.avs.speedSetChosen.textContent = switchSpeedSet(1)
+        switchSpeedSet(v, 1)
         break
       case "setPrevSet":
         log("setPrevSet", 5);
-        v.avs.speedSetChosen.textContent = switchSpeedSet(-1)
+        switchSpeedSet(v, -1)
         break
       case "jumpspeed":
         log("jump speed:"+value, 5);
-        v.avs.speedList.classList.toggle("show");
+        v.avs.speedDropdown.classList.toggle("show");
         v.avs.btnListSpeeds.classList.toggle("on");
         setSpeed(v, value)
         break
