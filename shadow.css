@@ -110,7 +110,7 @@ button.hideButton {
   opacity: 0.75;
   margin-right: 2px;
 }
-#speedDropdown > button {
+#speedList > button {
   min-width: 5.7em;
   padding: 0 0.3em;
   line-height: 15px;
