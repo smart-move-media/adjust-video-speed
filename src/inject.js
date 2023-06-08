@@ -116,16 +116,16 @@ function buildSpeedDropdown() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList()}</div>
+  <div id="speedList">${buildSpeedList(speedValues)}</div>
 </div>
 `
 }
-function buildSpeedList() {
+function buildSpeedList(speedArr=[]) {
   let speedList = ``
-  for (let idx = 0; idx<speedValues.length; idx++) {
-    // const rate = speedValues[idx].toFixed(7)
-    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedValues[idx]}">
-${formatSpeedIndicator( speedValues[idx], idx)}
+  for (let idx = 0; idx<speedArr.length; idx++) {
+    // const rate = speedArr[idx].toFixed(7)
+    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx]}">
+${formatSpeedIndicator( speedArr[idx], idx)}
 </button>
 `
   }

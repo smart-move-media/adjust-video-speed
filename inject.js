@@ -53,7 +53,7 @@ var tcDefaults = {
       ["+11", 1.8877486],
       ["+12", 2]
     ],
-    pitch432: [
+    pitch432Hz: [
       ["-24", 0.2454545],
       ["-12", 0.4909091],
       ["-11", 0.5201001],
@@ -138,15 +138,15 @@ var buildSpeedDropdown = function() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList()}</div>
+  <div id="speedList">${buildSpeedList(speedValues)}</div>
 </div>
 `;
 };
-var buildSpeedList = function() {
+var buildSpeedList = function(speedArr = []) {
   let speedList = ``;
-  for (let idx = 0;idx < speedValues.length; idx++) {
-    speedList += `<button data-action="jumpspeed" data-value="${speedValues[idx]}">
-${formatSpeedIndicator(speedValues[idx], idx)}
+  for (let idx = 0;idx < speedArr.length; idx++) {
+    speedList += `<button data-action="jumpspeed" data-value="${speedArr[idx]}">
+${formatSpeedIndicator(speedArr[idx], idx)}
 </button>
 `;
   }

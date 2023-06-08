@@ -102,6 +102,12 @@ Install [Bun](https://bun.sh/) for the builder.
 If you want to edit the `inject.js` & `options.js`, do so only in `./src`
 `npm build`
 
+#### ToDo:
+
+  * scroll only the speedList buttons, & keep top contolls fixed
+    + most CSS in `shadow.css`, but `inspect.js` has `id="controller"` & `buildSpeedDropdown()`
+  * return prefs UI
+
 ### License
 
 (MIT License)
