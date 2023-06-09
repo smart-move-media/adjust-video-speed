@@ -116,7 +116,7 @@ function buildSpeedDropdown() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList(speedValues)}</div>
+  <div id="speedList">${buildSpeedList(tc.settings.speedSets[tc.settings.speedSetChosen])}</div>
 </div>
 `
 }
@@ -124,8 +124,8 @@ function buildSpeedList(speedArr=[]) {
   let speedList = ``
   for (let idx = 0; idx<speedArr.length; idx++) {
     // const rate = speedArr[idx].toFixed(7)
-    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx]}">
-${formatSpeedIndicator( speedArr[idx], idx)}
+    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}">
+${formatSpeedIndicator( speedArr[idx][0], idx)}
 </button>
 `
   }
@@ -143,7 +143,7 @@ function buildSpeedArrays() {
         length: Math.max(...arr.map(x => x.length))
       }).map(x => [])
     );
-  [speedNames, speedValues] = unzip(speedSet)
+  [speedValues, speedNames] = unzip(speedSet)
 }
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];

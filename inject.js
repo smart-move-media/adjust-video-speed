@@ -13,73 +13,69 @@ var tcDefaults = {
   speedTemplate: '<b style="display:inline-block;min-width:2.5em;">${speed3}</b><i class="hoverShow" style="min-width:3.3em;">: ${name}</i>',
   speedSets: {
     common: [
-      ["snail", 0.1],
-      ["turtle", 0.25],
-      ["half", 0.5],
-      ["slower", 0.75],
-      ["slow", 0.9],
-      ["normal", 1],
-      ["fast", 1.1],
-      ["faster", 1.25],
-      ["speedy", 1.5],
-      ["double", 2],
-      ["blazing", 3]
+      [0.25, "turtle"],
+      [0.5, "half"],
+      [0.75, "slower"],
+      [0.9, "slow"],
+      [1, "normal"],
+      [1.1, "fast"],
+      [1.25, "faster"],
+      [1.5, "speedy"],
+      [2, "double"]
     ],
     pitch: [
-      ["-24", 0.25],
-      ["-12", 0.5],
-      ["-11", 0.5297315],
-      ["-10", 0.561231],
-      ["-9", 0.5946036],
-      ["-8", 0.6299605],
-      ["-7", 0.6674199],
-      ["-6", 0.7071068],
-      ["-5", 0.7491535],
-      ["-4", 0.7937005],
-      ["-3", 0.8408964],
-      ["-2", 0.8908987],
-      ["-1", 0.9438743],
-      ["0", 1],
-      ["+1", 1.0594631],
-      ["+2", 1.122462],
-      ["+3", 1.1892071],
-      ["+4", 1.259921],
-      ["+5", 1.3348399],
-      ["+6", 1.4142136],
-      ["+7", 1.4983071],
-      ["+8", 1.5874011],
-      ["+9", 1.6817928],
-      ["+10", 1.7817974],
-      ["+11", 1.8877486],
-      ["+12", 2]
+      [0.5, "-12"],
+      [0.5297315, "-11"],
+      [0.561231, "-10"],
+      [0.5946036, "-9"],
+      [0.6299605, "-8"],
+      [0.6674199, "-7"],
+      [0.7071068, "-6"],
+      [0.7491535, "-5"],
+      [0.7937005, "-4"],
+      [0.8408964, "-3"],
+      [0.8908987, "-2"],
+      [0.9438743, "-1"],
+      [1, "0"],
+      [1.0594631, "+1"],
+      [1.122462, "+2"],
+      [1.1892071, "+3"],
+      [1.259921, "+4"],
+      [1.3348399, "+5"],
+      [1.4142136, "+6"],
+      [1.4983071, "+7"],
+      [1.5874011, "+8"],
+      [1.6817928, "+9"],
+      [1.7817974, "+10"],
+      [1.8877486, "+11"],
+      [2, "+12"]
     ],
     pitch432Hz: [
-      ["-24", 0.2454545],
-      ["-12", 0.4909091],
-      ["-11", 0.5201001],
-      ["-10", 0.5510268],
-      ["-9", 0.5837926],
-      ["-8", 0.6185067],
-      ["-7", 0.655285],
-      ["-6", 0.6942503],
-      ["-5", 0.7355326],
-      ["-4", 0.7792696],
-      ["-3", 0.8256074],
-      ["-2", 0.8747006],
-      ["-1", 0.926713],
-      ["+0", 0.9818182],
-      ["+1", 1.0402001],
-      ["+2", 1.1020536],
-      ["+3", 1.1675852],
-      ["+4", 1.2370134],
-      ["+5", 1.31057],
-      ["+6", 1.3885006],
-      ["+7", 1.4710651],
-      ["+8", 1.5585392],
-      ["+9", 1.6512148],
-      ["+10", 1.7494011],
-      ["+11", 1.8534259],
-      ["+12", 1.9636364]
+      [0.4909091, "-12"],
+      [0.5201001, "-11"],
+      [0.5510268, "-10"],
+      [0.5837926, "-9"],
+      [0.6185067, "-8"],
+      [0.655285, "-7"],
+      [0.6942503, "-6"],
+      [0.7355326, "-5"],
+      [0.7792696, "-4"],
+      [0.8256074, "-3"],
+      [0.8747006, "-2"],
+      [0.926713, "-1"],
+      [0.9818182, "0"],
+      [1.0402001, "+1"],
+      [1.1020536, "+2"],
+      [1.1675852, "+3"],
+      [1.2370134, "+4"],
+      [1.31057, "+5"],
+      [1.3885006, "+6"],
+      [1.4710651, "+7"],
+      [1.5585392, "+8"],
+      [1.6512148, "+9"],
+      [1.7494011, "+10"],
+      [1.8534259, "+11"],
+      [1.9636364, "+12"]
     ]
   },
   speedSetChosen: "common",
@@ -138,15 +134,15 @@ var buildSpeedDropdown = function() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList(speedValues)}</div>
+  <div id="speedList">${buildSpeedList(tc.settings.speedSets[tc.settings.speedSetChosen])}</div>
 </div>
 `;
 };
 var buildSpeedList = function(speedArr = []) {
   let speedList = ``;
   for (let idx = 0;idx < speedArr.length; idx++) {
-    speedList += `<button data-action="jumpspeed" data-value="${speedArr[idx]}">
-${formatSpeedIndicator(speedArr[idx], idx)}
+    speedList += `<button data-action="jumpspeed" data-value="${speedArr[idx][0]}">
+${formatSpeedIndicator(speedArr[idx][0], idx)}
 </button>
 `;
   }
@@ -157,7 +153,7 @@ var buildSpeedArrays = function() {
   const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
     length: Math.max(...arr.map((x) => x.length))
   }).map((x) => []));
-  [speedNames, speedValues] = unzip(speedSet);
+  [speedValues, speedNames] = unzip(speedSet);
 };
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
