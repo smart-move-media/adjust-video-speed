@@ -116,7 +116,7 @@ var getKeyBindings = function(action, what = "value") {
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
-var formatSpeedIndicator = function(speed, idx = speedValues.findIndex((num) => num == speed), action = "drag", name = speedNames[idx] ?? "--") {
+var formatSpeedIndicator = function(speed, idx = tc.settings.speedSets[tc.settings.speedSetChosen].findIndex(([num, name2]) => num == speed), action = "drag", name = tc.settings.speedSets[tc.settings.speedSetChosen][idx][1] ?? "--") {
   let percent = speed * 100;
   return injectTemplate({
     action,
@@ -148,13 +148,6 @@ ${formatSpeedIndicator(speedArr[idx][0], idx)}
   }
   return speedList;
 };
-var buildSpeedArrays = function() {
-  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
-  const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
-    length: Math.max(...arr.map((x) => x.length))
-  }).map((x) => []));
-  [speedValues, speedNames] = unzip(speedSet);
-};
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -170,7 +163,6 @@ var setStoredSpeed = function(target) {
 };
 var defineVideoController = function() {
   speedSetNames = Object.keys(tc.settings.speedSets);
-  buildSpeedArrays();
   tc.videoController = function(target, parent) {
     if (target.avs) {
       return target.avs;
@@ -563,7 +555,6 @@ var switchSpeedSet = function(video, step = 0) {
   idx = idx < 0 ? speedSetCount : idx > speedSetCount ? 0 : idx;
   const ret = speedSetNames[idx];
   tc.settings.speedSetChosen = ret;
-  buildSpeedArrays();
   log(idx + ":" + ret, 4);
   video.avs.speedSetChosen.textContent = ret;
   video.avs.speedList.innerHTML = buildSpeedList();
@@ -571,18 +562,20 @@ var switchSpeedSet = function(video, step = 0) {
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
   log(`(${playbackRate})`, 4);
-  for (let idx = 0;idx < speedValues.length; idx++) {
-    const rate = speedValues[idx].toFixed(7);
-    log("+" + idx + "=" + speedNames[idx] + "~" + rate + "-" + playbackRate, 4);
+  const sSC = tc.settings.speedSets[tc.settings.speedSetChosen];
+  const len = sSC.length;
+  for (let idx = 0;idx < len; idx++) {
+    const rate = sSC[idx][0].toFixed(7);
+    log("+" + idx + "=" + sSC[idx][1] + "~" + rate + "-" + playbackRate, 4);
     if (playbackRate > rate)
       continue;
     if (direction === "-") {
-      setSpeed(video, speedValues[Math.max(idx - 1, 0)]);
+      setSpeed(video, sSC[Math.max(idx - 1, 0)][0]);
       break;
     } else if (direction === "+") {
       if (playbackRate === rate)
         idx += 1;
-      setSpeed(video, speedValues[Math.min(idx, speedValues.length - 1)]);
+      setSpeed(video, sSC[Math.min(idx, len - 1)][0]);
       break;
     }
   }
@@ -742,10 +735,7 @@ var tc = {
   },
   mediaElements: []
 };
-var speedSet;
-var speedSetNames;
-var speedNames;
-var speedValues = [];
+var speedSetNames = [];
 var storedSpeed = 1;
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)

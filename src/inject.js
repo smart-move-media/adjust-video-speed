@@ -15,7 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSet, speedSetNames, speedNames, speedValues = []
+let speedSetNames = []
 let storedSpeed = 1.0
 
 for (let field of SettingFieldsSynced){
@@ -92,9 +92,9 @@ let injectTemplate =(obj)=>
     .replace(/\${(.*?)}/g, (x,g)=> obj[g])
 function formatSpeedIndicator(
   speed,
-  idx = speedValues.findIndex(num=> num == speed),
+  idx = tc.settings.speedSets[tc.settings.speedSetChosen].findIndex(([num, name])=> num == speed),
   action = 'drag',
-  name = speedNames[idx] ?? '--',
+  name = tc.settings.speedSets[tc.settings.speedSetChosen][idx][1] ?? '--',
 ) {
   let percent = (speed * 100)
   return injectTemplate({
@@ -132,19 +132,6 @@ ${formatSpeedIndicator( speedArr[idx][0], idx)}
   return speedList
 }
 
-function buildSpeedArrays() {
-  //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
-  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
-  const unzip = (arr)=>
-    arr.reduce( (acc, val)=> (
-      val.forEach( (v, i)=>
-        acc[i].push(v)), acc
-      ), Array.from({
-        length: Math.max(...arr.map(x => x.length))
-      }).map(x => [])
-    );
-  [speedValues, speedNames] = unzip(speedSet)
-}
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -161,7 +148,6 @@ function setStoredSpeed(target) {
 function defineVideoController() {
   // refresh global settings var
   speedSetNames = Object.keys(tc.settings.speedSets)
-  buildSpeedArrays()
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -710,7 +696,6 @@ function switchSpeedSet(video, step=0) { //0 acts like refresh speedbuttons
   idx = (idx<0) ? speedSetCount : (idx>speedSetCount) ? 0 : idx;
   const ret = speedSetNames[idx]
   tc.settings.speedSetChosen = ret
-  buildSpeedArrays()
   log(idx +':'+ ret, 4)
   video.avs.speedSetChosen.textContent = ret
   video.avs.speedList.innerHTML = buildSpeedList()
@@ -719,17 +704,19 @@ function switchSpeedSet(video, step=0) { //0 acts like refresh speedbuttons
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
   log(`(${playbackRate})`, 4)
-  for (let idx = 0; idx<speedValues.length; idx++) {
-    const rate = speedValues[idx].toFixed(7)
-    log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
+  const sSC = tc.settings.speedSets[tc.settings.speedSetChosen]
+  const len = sSC.length
+  for (let idx = 0; idx<len; idx++) {
+    const rate = sSC[idx][0].toFixed(7)
+    log('+'+ idx +'='+ sSC[idx][1] +'~'+ rate +'-'+ playbackRate, 4)
     if (playbackRate > rate) continue
     if (direction === '-') {
-      setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
+      setSpeed(video, sSC[ Math.max(idx-1, 0) ][0]);
       break;
     } else if (direction === '+') {
       if (playbackRate === rate) idx += 1
       // if playbackRate < rate keep idx
-      setSpeed(video, speedValues[ Math.min(idx, speedValues.length-1) ]);
+      setSpeed(video, sSC[ Math.min(idx, len-1) ][0]);
       break;
     }
   }
