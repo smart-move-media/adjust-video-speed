@@ -38,13 +38,10 @@
 }
 
 #speedDropdown,
-#speedList {
+#speedList div {
   flex-direction: column;
   align-content: flex-start;
   gap: 2px;
-}
-#speedList {
-  display: flex;
 }
 
 #speedSetNames {
@@ -57,7 +54,7 @@
   font-weight: bold;
 }
 
-/* display/hide */
+/* display/hide controlls */
 #controls,
 .hoverShow,
 #speedDropdown {
@@ -70,6 +67,13 @@
   display: inline;
 }
 #controller:hover #speedDropdown.show {
+  display: flex;
+}
+/* display/hide speedLists */
+#speedList div {
+  display: none;
+}
+#speedList div.show {
   display: flex;
 }
 
@@ -110,7 +114,7 @@ button.hideButton {
   opacity: 0.75;
   margin-right: 2px;
 }
-#speedList > button {
+#speedList div > button {
   min-width: 5.7em;
   padding: 0 0.3em;
   line-height: 15px;

@@ -116,8 +116,9 @@ var getKeyBindings = function(action, what = "value") {
 var setKeyBindings = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
-var formatSpeedIndicator = function(speed, idx = tc.settings.speedSets[tc.settings.speedSetChosen].findIndex(([num, name2]) => num == speed), action = "drag", name = tc.settings.speedSets[tc.settings.speedSetChosen][idx][1] ?? "--") {
+var formatSpeedIndicator = function(speed, arr = tc.settings.speedSets[tc.settings.speedSetChosen], idx = arr.findIndex(([num, name2]) => num == speed), action = "drag", name = arr[idx][1] ?? "--") {
   let percent = speed * 100;
+  log(`${speed} ${arr} ${idx}`);
   return injectTemplate({
     action,
     name,
@@ -134,17 +135,23 @@ var buildSpeedDropdown = function() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList(tc.settings.speedSets[tc.settings.speedSetChosen])}</div>
+  <div id="speedList">${buildSpeedList()}</div>
 </div>
 `;
 };
-var buildSpeedList = function(speedArr = []) {
+var buildSpeedList = function() {
   let speedList = ``;
-  for (let idx = 0;idx < speedArr.length; idx++) {
-    speedList += `<button data-action="jumpspeed" data-value="${speedArr[idx][0]}">
-${formatSpeedIndicator(speedArr[idx][0], idx)}
+  let arr = [];
+  for (let jdx = 0;jdx < speedSetNames.length; jdx++) {
+    arr = tc.settings.speedSets[speedSetNames[jdx]];
+    speedList += `<div id="${speedSetNames[jdx]}" ${speedSetNames[jdx] == tc.settings.speedSetChosen ? 'class="show"' : ""}>`;
+    for (let idx = 0;idx < arr.length; idx++) {
+      speedList += `<button data-action="jumpspeed" data-value="${arr[idx][0]}">
+${formatSpeedIndicator(arr[idx][0], arr, idx)}
 </button>
 `;
+    }
+    speedList += `</div>`;
   }
   return speedList;
 };
@@ -551,13 +558,15 @@ var initializeNow = function(document2) {
 var switchSpeedSet = function(video, step = 0) {
   log(`(${step})`, 4);
   const speedSetCount = speedSetNames.length - 1;
-  let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step;
-  idx = idx < 0 ? speedSetCount : idx > speedSetCount ? 0 : idx;
-  const ret = speedSetNames[idx];
+  const oldIdx = speedSetNames.indexOf(tc.settings.speedSetChosen);
+  let newIdx = oldIdx + step;
+  newIdx = newIdx < 0 ? speedSetCount : newIdx > speedSetCount ? 0 : newIdx;
+  const ret = speedSetNames[newIdx];
   tc.settings.speedSetChosen = ret;
-  log(idx + ":" + ret, 4);
+  log(newIdx + ":" + ret, 4);
+  video.avs.speedList.children.item(oldIdx).classList.remove("show");
   video.avs.speedSetChosen.textContent = ret;
-  video.avs.speedList.innerHTML = buildSpeedList();
+  video.avs.speedList.children.item(newIdx).classList.add("show");
 };
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
