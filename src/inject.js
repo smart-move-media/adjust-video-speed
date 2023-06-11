@@ -112,33 +112,6 @@ function formatSpeedIndicator(
   })
 }
 
-function buildSpeedDropdown() {
-  return /*html*/`<div id="speedDropdown">
-  <div id="speedSetNames">
-    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
-  </div>
-  <div id="speedList">${buildSpeedList()}</div>
-</div>
-`
-}
-function buildSpeedList() {
-  let speedList = ``
-  let arr = []
-  for (let jdx = 0; jdx<speedSetNames.length; jdx++) {
-    arr = tc.settings.speedSets[speedSetNames[jdx]]
-    speedList += `<div id="${speedSetNames[jdx]}" ${(speedSetNames[jdx] == tc.settings.speedSetChosen) ? 'class="show"' : ''}>`
-    for (let idx = 0; idx<arr.length; idx++) {
-      // const rate = arr[idx].toFixed(7)
-      speedList += /*html*/`<button data-action="jumpspeed" data-value="${arr[idx][0]}">
-${formatSpeedIndicator( arr[idx][0], arr, idx)}
-</button>
-`
-    }
-  speedList += `</div>`
-  }
-  return speedList
-}
-
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -252,6 +225,30 @@ function defineVideoController() {
     if (!this.video.currentSrc) wrapper.classList.add("avs-nosource");
     if (tc.settings.startHidden) wrapper.classList.add("avs-hidden");
 
+
+    // build speedList dropdown {
+    let speedList = ``
+    let arr = []
+    for (let jdx = 0; jdx<speedSetNames.length; jdx++) {
+      arr = tc.settings.speedSets[speedSetNames[jdx]]
+      speedList += `<div id="${speedSetNames[jdx]}" ${(speedSetNames[jdx] == tc.settings.speedSetChosen) ? 'class="show"' : ''}>`
+      for (let idx = 0; idx<arr.length; idx++) {
+        // const rate = arr[idx].toFixed(7)
+        speedList += /*html*/`<button data-action="jumpspeed" data-value="${arr[idx][0]}">
+${formatSpeedIndicator( arr[idx][0], arr, idx)}
+</button>
+`
+      }
+      speedList += `</div>`
+    }
+    speedList = /*html*/`<div id="speedDropdown">
+  <div id="speedSetNames">
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
+  </div>
+  <div id="speedList">${speedList}</div>
+</div>
+`
+
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = /*html*/`
 <style>
@@ -264,10 +261,10 @@ function defineVideoController() {
   <span id="controls">
     <button data-action="rewind" class="rw">«</button>
     <button data-action="slower">&minus;</button>
-    <button data-action="listspeeds" class="rw">&equiv;</button>
+    <button data-action="listspeeds" class="rw">⚙</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">»</button>
-  </span>${buildSpeedDropdown()}
+  </span>${speedList}
 </div>
  `;
     shadow.innerHTML = shadowTemplate;
@@ -343,18 +340,16 @@ function defineVideoController() {
   };
 }
 
-function escapeStringRegExp(str) {
-  matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
-  return str.replace(matchOperatorsRe, "\\$&");
-}
-
 function isBlacklisted() {
   blacklisted = false;
+  function escapeStringRegExp(str) {
+    matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+    return str.replace(matchOperatorsRe, "\\$&");
+  }
+
   tc.settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
-    if (match.length == 0) {
-      return;
-    }
+    if (match.length == 0) return;
 
     if (match.startsWith("/")) {
       try {
@@ -483,13 +478,7 @@ function initializeWhenReady(document) {
   }
   log("End initializeWhenReady", 5);
 }
-function inIframe() {
-  try {
-    return window.self !== window.top;
-  } catch (e) {
-    return true;
-  }
-}
+
 function getShadow(parent) {
   let result = [];
   function getChild(parent) {
@@ -535,8 +524,10 @@ function initializeNow(document) {
   }
   var docs = Array(document);
   try {
-    if (inIframe()) docs.push(window.top.document);
-  } catch (e) {}
+    if (window.self === window.top) docs.push(window.top.document);
+  } catch (e) {
+    //noop
+  }
 
   docs.forEach(function (doc) {
     doc.addEventListener(
@@ -558,7 +549,6 @@ function initializeNow(document) {
           log("Keydown event ignored due to active modifier: " + keyCode, 5);
           return;
         }
-
         // Ignore keydown event if typing in an input box
         if (
           event.target.nodeName === "INPUT" ||
@@ -567,12 +557,10 @@ function initializeNow(document) {
         ) {
           return false;
         }
-
         // Ignore keydown event if typing in a page without avs
         if (!tc.mediaElements.length) {
           return false;
         }
-
         var item = tc.settings.keyBindings.find((item) => item.key === keyCode);
         if (item) {
           runAction(item.action, item.value);
@@ -582,7 +570,6 @@ function initializeNow(document) {
             event.stopPropagation();
           }
         }
-
         return false;
       },
       true
