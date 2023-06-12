@@ -130,6 +130,31 @@ var formatSpeedIndicator = function(speed, arr = tc.settings.speedSets[tc.settin
     speed3: Number(speed).toFixed(3)
   });
 };
+var buildSpeedDropdown = function() {
+  return `<div id="speedDropdown">
+  <div id="speedSetNames">
+    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
+  </div>
+  <div id="speedList">${buildSpeedList()}</div>
+</div>
+`;
+};
+var buildSpeedList = function() {
+  let speedList = ``;
+  let arr = [];
+  for (let jdx = 0;jdx < speedSetNames.length; jdx++) {
+    arr = tc.settings.speedSets[speedSetNames[jdx]];
+    speedList += `<div id="${speedSetNames[jdx]}" ${speedSetNames[jdx] == tc.settings.speedSetChosen ? 'class="show"' : ""}>`;
+    for (let idx = 0;idx < arr.length; idx++) {
+      speedList += `<button data-action="jumpspeed" data-value="${arr[idx][0]}">
+${formatSpeedIndicator(arr[idx][0], arr, idx)}
+</button>
+`;
+    }
+    speedList += `</div>`;
+  }
+  return speedList;
+};
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -205,26 +230,6 @@ var defineVideoController = function() {
       wrapper.classList.add("avs-nosource");
     if (tc.settings.startHidden)
       wrapper.classList.add("avs-hidden");
-    let speedList = ``;
-    let arr = [];
-    for (let jdx = 0;jdx < speedSetNames.length; jdx++) {
-      arr = tc.settings.speedSets[speedSetNames[jdx]];
-      speedList += `<div id="${speedSetNames[jdx]}" ${speedSetNames[jdx] == tc.settings.speedSetChosen ? 'class="show"' : ""}>`;
-      for (let idx = 0;idx < arr.length; idx++) {
-        speedList += `<button data-action="jumpspeed" data-value="${arr[idx][0]}">
-${formatSpeedIndicator(arr[idx][0], arr, idx)}
-</button>
-`;
-      }
-      speedList += `</div>`;
-    }
-    speedList = `<div id="speedDropdown">
-  <div id="speedSetNames">
-    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
-  </div>
-  <div id="speedList">${speedList}</div>
-</div>
-`;
     var shadow = wrapper.attachShadow({ mode: "open" });
     var shadowTemplate = `
 <style>
@@ -237,10 +242,10 @@ ${formatSpeedIndicator(arr[idx][0], arr, idx)}
   <span id="controls">
     <button data-action="rewind" class="rw">\xAB</button>
     <button data-action="slower">&minus;</button>
-    <button data-action="listspeeds" class="rw">\u2699</button>
+    <button data-action="listspeeds" class="rw">&equiv;</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">\xBB</button>
-  </span>${speedList}
+  </span>${buildSpeedDropdown()}
 </div>
  `;
     shadow.innerHTML = shadowTemplate;
@@ -283,16 +288,17 @@ ${formatSpeedIndicator(arr[idx][0], arr, idx)}
     return wrapper;
   };
 };
+var escapeStringRegExp = function(str) {
+  matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+  return str.replace(matchOperatorsRe, "\\$&");
+};
 var isBlacklisted = function() {
   blacklisted = false;
-  function escapeStringRegExp(str) {
-    matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
-    return str.replace(matchOperatorsRe, "\\$&");
-  }
   tc.settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
-    if (match.length == 0)
+    if (match.length == 0) {
       return;
+    }
     if (match.startsWith("/")) {
       try {
         var parts = match.split("/");
@@ -390,6 +396,13 @@ var initializeWhenReady = function(document2) {
   }
   log("End initializeWhenReady", 5);
 };
+var inIframe = function() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+};
 var getShadow = function(parent) {
   let result = [];
   function getChild(parent2) {
@@ -432,7 +445,7 @@ var initializeNow = function(document2) {
   }
   var docs = Array(document2);
   try {
-    if (window.self === window.top)
+    if (inIframe())
       docs.push(window.top.document);
   } catch (e) {
   }
