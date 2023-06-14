@@ -15,7 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSetNames = []
+let speedSet, speedSetNames, speedNames, speedValues = []
 let storedSpeed = 1.0
 
 for (let field of SettingFieldsSynced){
@@ -93,14 +93,12 @@ let injectTemplate =(obj)=>
 function formatSpeedIndicator(
   speed,
   arr = tc.settings.speedSets[tc.settings.speedSetChosen],
-  idx = arr.findIndex(([num, name])=> num == speed),
-  action = 'drag',
-  name = arr[idx][1] ?? '--',
+  idx = arr.findIndex(([num,])=> num == speed),
 ) {
+  let name = arr?.[idx]?.[1] ?? '--'
   let percent = (speed * 100)
-  log(`${speed} ${arr} ${idx}`)
   return injectTemplate({
-    action: action, // RESERVED
+    action: 'drag', // RESERVED
     name: name,
     //TODO +1 number formatting
     percent: percent.toFixed(0) +'%',
@@ -109,6 +107,7 @@ function formatSpeedIndicator(
     speed: speed,
     speed2: Number(speed).toFixed(2),
     speed3: Number(speed).toFixed(3),
+    // speed4: Number(speed).toFixed(4),
   })
 }
 
@@ -117,28 +116,36 @@ function buildSpeedDropdown() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList()}</div>
+  <div id="speedList">${buildSpeedList('common')} ${buildSpeedList('pitch')} ${buildSpeedList('pitch432Hz')}</div>
 </div>
 `
 }
-function buildSpeedList() {
+function buildSpeedList(setKey=tc.settings.speedSetChosen) {
   let speedList = ``
-  let arr = []
-  for (let jdx = 0; jdx<speedSetNames.length; jdx++) {
-    arr = tc.settings.speedSets[speedSetNames[jdx]]
-    speedList += `<div id="${speedSetNames[jdx]}" ${(speedSetNames[jdx] == tc.settings.speedSetChosen) ? 'class="show"' : ''}>`
-    for (let idx = 0; idx<arr.length; idx++) {
-      // const rate = arr[idx].toFixed(7)
-      speedList += /*html*/`<button data-action="jumpspeed" data-value="${arr[idx][0]}">
-${formatSpeedIndicator( arr[idx][0], arr, idx)}
+  let speedArr = tc.settings.speedSets[setKey]
+  for (let idx = 0; idx<speedArr.length; idx++) {
+    const classNames = (tc.settings.speedSetChosen === setKey) ? setKey +' show' : setKey
+    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}" class="${classNames}">
+${formatSpeedIndicator( speedArr[idx][0], speedArr, idx)}
 </button>
 `
-    }
-  speedList += `</div>`
   }
   return speedList
 }
 
+function buildSpeedArrays() {
+  //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
+  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
+  const unzip = (arr)=>
+    arr.reduce( (acc, val)=> (
+      val.forEach( (v, i)=>
+        acc[i].push(v)), acc
+      ), Array.from({
+        length: Math.max(...arr.map(x => x.length))
+      }).map(x => [])
+    );
+  [speedValues, speedNames] = unzip(speedSet)
+}
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -155,6 +162,7 @@ function setStoredSpeed(target) {
 function defineVideoController() {
   // refresh global settings var
   speedSetNames = Object.keys(tc.settings.speedSets)
+  buildSpeedArrays()
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -182,13 +190,13 @@ function defineVideoController() {
 
     this.div = this.initializeControls();
 
-    let mediaEventAction = function (event) {
+    function mediaEventAction(event) {
       setStoredSpeed(event.target)
       // TODO: Check if explicitly setting the playback rate to 1.0 is
       // necessary when rememberSpeed is disabled (this may accidentally
       // override a website's intentional initial speed setting interfering
       // with the site's default behavior)
-      log("Explicitly setting playbackRate to: " + storedSpeed, 4);
+      log("mediaEventAction~Explicitly setting playbackRate to: " + storedSpeed, 4);
       setSpeed(event.target, storedSpeed);
     };
     target.addEventListener(
@@ -264,7 +272,7 @@ function defineVideoController() {
   <span id="controls">
     <button data-action="rewind" class="rw">«</button>
     <button data-action="slower">&minus;</button>
-    <button data-action="listspeeds" class="rw">&equiv;</button>
+    <button data-action="listspeeds" class="rw">⚙</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">»</button>
   </span>${buildSpeedDropdown()}
@@ -305,6 +313,8 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.speedIndicator = shadow.querySelector("#speedDisplay");
+log(tc.settings.speedSetChosen)
+log(tc.settings.speedSets[tc.settings.speedSetChosen])
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
@@ -347,7 +357,6 @@ function escapeStringRegExp(str) {
   matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
   return str.replace(matchOperatorsRe, "\\$&");
 }
-
 function isBlacklisted() {
   blacklisted = false;
   tc.settings.blacklist.split("\n").forEach((match) => {
@@ -697,35 +706,37 @@ function initializeNow(document) {
 }
 
 function switchSpeedSet(video, step=0) { //0 acts like refresh speedbuttons
-  log(`(${step})`, 4)
+  const oldret = tc.settings.speedSetChosen
+  let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step
   const speedSetCount = speedSetNames.length - 1
-  const oldIdx = speedSetNames.indexOf(tc.settings.speedSetChosen)
-  let newIdx = oldIdx + step
-  newIdx = (newIdx<0) ? speedSetCount : (newIdx>speedSetCount) ? 0 : newIdx;
-  const ret = speedSetNames[newIdx]
+  idx = (idx<0) ? speedSetCount : (idx>speedSetCount) ? 0 : idx;
+  const ret = speedSetNames[idx]
+
   tc.settings.speedSetChosen = ret
-  log(newIdx +':'+ ret, 4)
-  video.avs.speedList.children.item(oldIdx).classList.remove("show")
+  buildSpeedArrays()
+  log(idx +':'+ ret, 4)
   video.avs.speedSetChosen.textContent = ret
-  video.avs.speedList.children.item(newIdx).classList.add("show")
+  // hide & show buttons
+  let sl = [...video.avs.speedList.getElementsByClassName(oldret)]
+  sl.forEach(el => el.classList.remove('show'))
+  sl = [...video.avs.speedList.getElementsByClassName(ret)]
+  sl.forEach(el => el.classList.add('show'))
 }
 
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
   log(`(${playbackRate})`, 4)
-  const sSC = tc.settings.speedSets[tc.settings.speedSetChosen]
-  const len = sSC.length
-  for (let idx = 0; idx<len; idx++) {
-    const rate = sSC[idx][0].toFixed(7)
-    log('+'+ idx +'='+ sSC[idx][1] +'~'+ rate +'-'+ playbackRate, 4)
+  for (let idx = 0; idx<speedValues.length; idx++) {
+    const rate = speedValues[idx].toFixed(7)
+    log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
     if (playbackRate > rate) continue
     if (direction === '-') {
-      setSpeed(video, sSC[ Math.max(idx-1, 0) ][0]);
+      setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
       break;
     } else if (direction === '+') {
       if (playbackRate === rate) idx += 1
       // if playbackRate < rate keep idx
-      setSpeed(video, sSC[ Math.min(idx, len-1) ][0]);
+      setSpeed(video, speedValues[ Math.min(idx, speedValues.length-1) ]);
       break;
     }
   }
@@ -946,18 +957,4 @@ function handleDrag(video, e) {
   parentElement.addEventListener("mouseup", stopDragging);
   parentElement.addEventListener("mouseleave", stopDragging);
   parentElement.addEventListener("mousemove", startDragging);
-}
-
-var timer = null;
-function showController(controller) {
-  log("Showing controller", 4);
-  controller.classList.add("vcs-show");
-
-  if (timer) clearTimeout(timer);
-
-  timer = setTimeout(function () {
-    controller.classList.remove("vcs-show");
-    timer = false;
-    log("Hiding controller", 5);
-  }, 2000);
 }
