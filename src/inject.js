@@ -15,7 +15,7 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSet, speedSetNames, speedNames, speedValues = []
+let speedSetNames, speedValues = []
 let storedSpeed = 1.0
 
 for (let field of SettingFieldsSynced){
@@ -116,26 +116,29 @@ function buildSpeedDropdown() {
   <div id="speedSetNames">
     <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
   </div>
-  <div id="speedList">${buildSpeedList('common')} ${buildSpeedList('pitch')} ${buildSpeedList('pitch432Hz')}</div>
+  <div id="speedList">${buildSpeedList()}</div>
 </div>
 `
 }
-function buildSpeedList(setKey=tc.settings.speedSetChosen) {
+function buildSpeedList() {
   let speedList = ``
-  let speedArr = tc.settings.speedSets[setKey]
-  for (let idx = 0; idx<speedArr.length; idx++) {
-    const classNames = (tc.settings.speedSetChosen === setKey) ? setKey +' show' : setKey
-    speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}" class="${classNames}">
+  for (let setidx = 0; setidx<speedSetNames.length; setidx++) {
+    const setName = speedSetNames[setidx]
+    const speedArr = tc.settings.speedSets[setName]
+    for (let idx = 0; idx<speedArr.length; idx++) {
+      const classNames = (tc.settings.speedSetChosen === setName) ? setName +' show' : setName
+      speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}" class="${classNames}">
 ${formatSpeedIndicator( speedArr[idx][0], speedArr, idx)}
 </button>
 `
+    }
   }
   return speedList
 }
 
 function buildSpeedArrays() {
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
-  speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
+  const speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
     arr.reduce( (acc, val)=> (
       val.forEach( (v, i)=>
@@ -144,7 +147,7 @@ function buildSpeedArrays() {
         length: Math.max(...arr.map(x => x.length))
       }).map(x => [])
     );
-  [speedValues, speedNames] = unzip(speedSet)
+  [speedValues,] = unzip(speedSet)
 }
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -728,7 +731,7 @@ function changeSpeed(video, direction='') {
   log(`(${playbackRate})`, 4)
   for (let idx = 0; idx<speedValues.length; idx++) {
     const rate = speedValues[idx].toFixed(7)
-    log('+'+ idx +'='+ speedNames[idx] +'~'+ rate +'-'+ playbackRate, 4)
+    log('+'+ idx +'='+ rate +'-'+ playbackRate, 4)
     if (playbackRate > rate) continue
     if (direction === '-') {
       setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
