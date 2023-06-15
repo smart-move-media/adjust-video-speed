@@ -155,11 +155,15 @@ ${formatSpeedIndicator(speedArr[idx][0], speedArr, idx)}
   return speedList;
 };
 var buildSpeedArrays = function() {
-  const speedSet = tc.settings.speedSets[tc.settings.speedSetChosen];
   const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
     length: Math.max(...arr.map((x) => x.length))
   }).map((x) => []));
-  [speedValues] = unzip(speedSet);
+  for (let idx = 0;idx < speedSetNames.length; idx++) {
+    [vArr] = unzip(tc.settings.speedSets[speedSetNames[idx]]);
+    sVObj[speedSetNames[idx]] = vArr;
+  }
+  console.log("buildSpeedArrays");
+  console.log(sVObj);
 };
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -565,22 +569,22 @@ var initializeNow = function(document2) {
   log("End initializeNow", 5);
 };
 var switchSpeedSet = function(video, step = 0) {
-  const oldret = tc.settings.speedSetChosen;
+  const oldres = tc.settings.speedSetChosen;
   let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step;
   const speedSetCount = speedSetNames.length - 1;
   idx = idx < 0 ? speedSetCount : idx > speedSetCount ? 0 : idx;
-  const ret = speedSetNames[idx];
-  tc.settings.speedSetChosen = ret;
-  buildSpeedArrays();
-  log(idx + ":" + ret, 4);
-  video.avs.speedSetChosen.textContent = ret;
-  let sl = [...video.avs.speedList.getElementsByClassName(oldret)];
+  const res = speedSetNames[idx];
+  tc.settings.speedSetChosen = res;
+  log(idx + ":" + res, 4);
+  video.avs.speedSetChosen.textContent = res;
+  let sl = [...video.avs.speedList.getElementsByClassName(oldres)];
   sl.forEach((el) => el.classList.remove("show"));
-  sl = [...video.avs.speedList.getElementsByClassName(ret)];
+  sl = [...video.avs.speedList.getElementsByClassName(res)];
   sl.forEach((el) => el.classList.add("show"));
 };
 var changeSpeed = function(video, direction = "") {
   const playbackRate = video.playbackRate.toFixed(7);
+  const speedValues = sVObj[tc.settings.speedSetChosen];
   log(`(${playbackRate})`, 4);
   for (let idx = 0;idx < speedValues.length; idx++) {
     const rate = speedValues[idx].toFixed(7);
@@ -753,8 +757,8 @@ var tc = {
   },
   mediaElements: []
 };
-var speedSetNames;
-var speedValues = [];
+var speedSetNames = [];
+var sVObj = {};
 var storedSpeed = 1;
 for (let field of SettingFieldsSynced) {
   if (tcDefaults[field] === undefined)

@@ -15,7 +15,8 @@ var tc = {
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
-let speedSetNames, speedValues = []
+let speedSetNames = []
+let speedValues = {}
 let storedSpeed = 1.0
 
 for (let field of SettingFieldsSynced){
@@ -138,7 +139,6 @@ ${formatSpeedIndicator( speedArr[idx][0], speedArr, idx)}
 
 function buildSpeedArrays() {
   //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
-  const speedSet = tc.settings.speedSets[tc.settings.speedSetChosen]
   const unzip = (arr)=>
     arr.reduce( (acc, val)=> (
       val.forEach( (v, i)=>
@@ -147,7 +147,10 @@ function buildSpeedArrays() {
         length: Math.max(...arr.map(x => x.length))
       }).map(x => [])
     );
-  [speedValues,] = unzip(speedSet)
+  for (let idx = 0; idx<speedSetNames.length; idx++) {
+    [vArr,] = unzip( tc.settings.speedSets[speedSetNames[idx]] )
+    speedValues[ speedSetNames[idx] ] = vArr
+  }
 }
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -709,37 +712,37 @@ function initializeNow(document) {
 }
 
 function switchSpeedSet(video, step=0) { //0 acts like refresh speedbuttons
-  const oldret = tc.settings.speedSetChosen
+  const oldres = tc.settings.speedSetChosen
   let idx = speedSetNames.indexOf(tc.settings.speedSetChosen) + step
   const speedSetCount = speedSetNames.length - 1
   idx = (idx<0) ? speedSetCount : (idx>speedSetCount) ? 0 : idx;
-  const ret = speedSetNames[idx]
+  const res = speedSetNames[idx]
 
-  tc.settings.speedSetChosen = ret
-  buildSpeedArrays()
-  log(idx +':'+ ret, 4)
-  video.avs.speedSetChosen.textContent = ret
+  tc.settings.speedSetChosen = res
+  log(idx +':'+ res, 4)
+  video.avs.speedSetChosen.textContent = res
   // hide & show buttons
-  let sl = [...video.avs.speedList.getElementsByClassName(oldret)]
+  let sl = [...video.avs.speedList.getElementsByClassName(oldres)]
   sl.forEach(el => el.classList.remove('show'))
-  sl = [...video.avs.speedList.getElementsByClassName(ret)]
+  sl = [...video.avs.speedList.getElementsByClassName(res)]
   sl.forEach(el => el.classList.add('show'))
 }
 
 function changeSpeed(video, direction='') {
   const playbackRate = video.playbackRate.toFixed(7)
+  const speedValuesCurrent = speedValues[tc.settings.speedSetChosen]
   log(`(${playbackRate})`, 4)
-  for (let idx = 0; idx<speedValues.length; idx++) {
-    const rate = speedValues[idx].toFixed(7)
+  for (let idx = 0; idx<speedValuesCurrent.length; idx++) {
+    const rate = speedValuesCurrent[idx].toFixed(7)
     log('+'+ idx +'='+ rate +'-'+ playbackRate, 4)
     if (playbackRate > rate) continue
     if (direction === '-') {
-      setSpeed(video, speedValues[ Math.max(idx-1, 0) ]);
+      setSpeed(video, speedValuesCurrent[ Math.max(idx-1, 0) ]);
       break;
     } else if (direction === '+') {
       if (playbackRate === rate) idx += 1
       // if playbackRate < rate keep idx
-      setSpeed(video, speedValues[ Math.min(idx, speedValues.length-1) ]);
+      setSpeed(video, speedValuesCurrent[ Math.min(idx, speedValuesCurrent.length-1) ]);
       break;
     }
   }
