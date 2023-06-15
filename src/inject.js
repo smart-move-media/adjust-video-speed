@@ -112,46 +112,6 @@ function formatSpeedIndicator(
   })
 }
 
-function buildSpeedDropdown() {
-  return /*html*/`<div id="speedDropdown">
-  <div id="speedSetNames">
-    <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
-  </div>
-  <div id="speedList">${buildSpeedList()}</div>
-</div>
-`
-}
-function buildSpeedList() {
-  let speedList = ``
-  for (let setidx = 0; setidx<speedSetNames.length; setidx++) {
-    const setName = speedSetNames[setidx]
-    const speedArr = tc.settings.speedSets[setName]
-    for (let idx = 0; idx<speedArr.length; idx++) {
-      const classNames = (tc.settings.speedSetChosen === setName) ? setName +' show' : setName
-      speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}" class="${classNames}">
-${formatSpeedIndicator( speedArr[idx][0], speedArr, idx)}
-</button>
-`
-    }
-  }
-  return speedList
-}
-
-function buildSpeedArrays() {
-  //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
-  const unzip = (arr)=>
-    arr.reduce( (acc, val)=> (
-      val.forEach( (v, i)=>
-        acc[i].push(v)), acc
-      ), Array.from({
-        length: Math.max(...arr.map(x => x.length))
-      }).map(x => [])
-    );
-  for (let idx = 0; idx<speedSetNames.length; idx++) {
-    [vArr,] = unzip( tc.settings.speedSets[speedSetNames[idx]] )
-    speedValues[ speedSetNames[idx] ] = vArr
-  }
-}
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
   if (tc.settings.rememberSpeed) {
@@ -166,9 +126,21 @@ function setStoredSpeed(target) {
   }
 }
 function defineVideoController() {
-  // refresh global settings var
+  // refresh global settings
   speedSetNames = Object.keys(tc.settings.speedSets)
-  buildSpeedArrays()
+  //TODO update speedSet upone save for prefs.  This only updates on browser refresh.
+  const unzip = (arr)=>
+    arr.reduce( (acc, val)=> (
+      val.forEach( (v, i)=>
+        acc[i].push(v)), acc
+      ), Array.from({
+        length: Math.max(...arr.map(x => x.length))
+      }).map(x => [])
+    );
+  for (let idx = 0; idx<speedSetNames.length; idx++) {
+    [vArr,] = unzip( tc.settings.speedSets[speedSetNames[idx]] )
+    speedValues[ speedSetNames[idx] ] = vArr
+  }
   // Data structures
   // ---------------
   // videoController (JS object) instances:
@@ -261,6 +233,19 @@ function defineVideoController() {
     // prevent speedDropdown from hidding behind video controlls
     const height = (rect.height - 133) + "px"
 
+    let speedList = ``
+    for (let setidx = 0; setidx<speedSetNames.length; setidx++) {
+      const setName = speedSetNames[setidx]
+      const speedArr = tc.settings.speedSets[setName]
+      for (let idx = 0; idx<speedArr.length; idx++) {
+        const classNames = (tc.settings.speedSetChosen === setName) ? setName +' show' : setName
+        speedList += /*html*/`<button data-action="jumpspeed" data-value="${speedArr[idx][0]}" class="${classNames}">
+  ${formatSpeedIndicator( speedArr[idx][0], speedArr, idx)}
+  </button>
+  `
+      }
+    }
+
     var wrapper = document.createElement("div");
     wrapper.classList.add("avs-controller");
     if (!this.video.currentSrc) wrapper.classList.add("avs-nosource");
@@ -281,7 +266,13 @@ function defineVideoController() {
     <button data-action="listspeeds" class="rw">⚙</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">»</button>
-  </span>${buildSpeedDropdown()}
+  </span>
+  <div id="speedDropdown">
+    <div id="speedSetNames">
+      <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
+    </div>
+    <div id="speedList">${speedList}</div>
+  </div>
 </div>
  `;
     shadow.innerHTML = shadowTemplate;
@@ -319,8 +310,6 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.speedIndicator = shadow.querySelector("#speedDisplay");
-log(tc.settings.speedSetChosen)
-log(tc.settings.speedSets[tc.settings.speedSetChosen])
     this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
