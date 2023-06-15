@@ -144,3 +144,19 @@ b[data-action="drag"] {
   margin: 2px;
   transition: background 0.2s, color 0.2s;
 }
+
+
+@keyframes highlightBg {
+  0% {
+    background: #0000
+  }
+  22% {
+    background: #21f32f99
+  }
+  to {
+    background: #0000
+  }
+}
+.highlight {
+  animation: highlightBg 0.55s ease-out;
+}

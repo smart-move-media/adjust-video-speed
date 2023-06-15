@@ -130,14 +130,12 @@ var formatSpeedIndicator = function(speed, arr = tc.settings.speedSets[tc.settin
     speed3: Number(speed).toFixed(3)
   });
 };
-var buildSpeedArrays = function() {
-  const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
-    length: Math.max(...arr.map((x) => x.length))
-  }).map((x) => []));
-  for (let idx = 0;idx < speedSetNames.length; idx++) {
-    [vArr] = unzip(tc.settings.speedSets[speedSetNames[idx]]);
-    speedValues[speedSetNames[idx]] = vArr;
-  }
+var updateSpeedIndicator = function(context, speed) {
+  context = context.speedIndicator;
+  context.classList.remove("highlight");
+  context.classList.add("highlight");
+  context.setHTML(formatSpeedIndicator(speed));
+  setTimeout(() => context.classList.remove("highlight"), 555);
 };
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -154,7 +152,13 @@ var setStoredSpeed = function(target) {
 };
 var defineVideoController = function() {
   speedSetNames = Object.keys(tc.settings.speedSets);
-  buildSpeedArrays();
+  const unzip = (arr) => arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
+    length: Math.max(...arr.map((x) => x.length))
+  }).map((x) => []));
+  for (let idx = 0;idx < speedSetNames.length; idx++) {
+    [vArr] = unzip(tc.settings.speedSets[speedSetNames[idx]]);
+    speedValues[speedSetNames[idx]] = vArr;
+  }
   tc.videoController = function(target, parent) {
     if (target.avs) {
       return target.avs;
@@ -265,9 +269,7 @@ var defineVideoController = function() {
     shadow.querySelector("#controller").addEventListener("click", (e) => e.stopPropagation(), false);
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
     this.speedIndicator = shadow.querySelector("#speedDisplay");
-    log(tc.settings.speedSetChosen);
-    log(tc.settings.speedSets[tc.settings.speedSetChosen]);
-    this.speedIndicator.setHTML(formatSpeedIndicator(speed));
+    updateSpeedIndicator(this, speed);
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.speedList = shadow.querySelector("#speedList");
@@ -347,7 +349,7 @@ var setupListener = function() {
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    video.avs.speedIndicator.setHTML(formatSpeedIndicator(speed));
+    updateSpeedIndicator(video.avs, speed);
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -605,7 +607,7 @@ var setSpeed = function(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
-  video.avs.speedIndicator.setHTML(formatSpeedIndicator(speed));
+  updateSpeedIndicator(video.avs, speed);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);

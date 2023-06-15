@@ -105,7 +105,7 @@ If you want to edit the `inject.js` & `options.js`, do so only in `./src`
 #### ToDo:
 
   * highlight chosen button
-  * flash display number when changed
+  * do not flash display number when value not changed (or flash gray)
   * scroll only the speedList buttons, & keep top contolls fixed
     + most CSS in `shadow.css`, but `inspect.js` has `id="controller"` & `buildSpeedDropdown()`
   * return prefs UI

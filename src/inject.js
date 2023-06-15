@@ -111,6 +111,13 @@ function formatSpeedIndicator(
     // speed4: Number(speed).toFixed(4),
   })
 }
+function updateSpeedIndicator(context, speed) {
+  context = context.speedIndicator
+  context.classList.remove('highlight');;
+  context.classList.add('highlight');;
+  context.setHTML( formatSpeedIndicator(speed) );
+  setTimeout( ()=> context.classList.remove('highlight'), 555)
+};
 
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -310,7 +317,7 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.speedIndicator = shadow.querySelector("#speedDisplay");
-    this.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+    updateSpeedIndicator(this, speed);
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.speedList = shadow.querySelector("#speedList");
@@ -420,7 +427,7 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    video.avs.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+    updateSpeedIndicator(video.avs, speed);
     tc.settings.playersSpeed[src] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -753,7 +760,7 @@ function setSpeed(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`)
   }
-  video.avs.speedIndicator.setHTML( formatSpeedIndicator(speed) );
+  updateSpeedIndicator(video.avs, speed);
   tc.settings.lastSpeed = speed;
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
