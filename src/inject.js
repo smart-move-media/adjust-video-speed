@@ -237,7 +237,7 @@ function defineVideoController() {
     const offsetRect = this.video.offsetParent?.getBoundingClientRect();
     const top = Math.max(rect.top - (offsetRect?.top || 0), 33) + "px"
     const left = Math.max(rect.left - (offsetRect?.left || 0), 33) + "px"
-    // prevent speedDropdown from hidding behind video controlls
+    // prevent speedDropdown from hidding behind video controls
     const height = (rect.height - 133) + "px"
 
     let speedList = ``
@@ -266,14 +266,21 @@ function defineVideoController() {
 <div id="controller"
   style="top:${top};left:${left};max-height:${height};opacity:${tc.settings.controllerOpacity}"
 >
+  <div id="topLine">
+    <button data-action="openMenu" style="opacity:0.7">⚙</button>
     <div id="speedDisplay" data-action="drag">--</div>
-  <span id="controls">
+  </div>
+  <div id="controls" class="show">
     <button data-action="rewind" class="rw">«</button>
     <button data-action="slower">&minus;</button>
-    <button data-action="listspeeds" class="rw">⚙</button>
     <button data-action="faster">&plus;</button>
     <button data-action="advance" class="rw">»</button>
-  </span>
+    <button data-action="blank" class="rw">?</button>
+  </div>
+  <div id="menu">
+    <button data-action="openSpeedDropdown" class="on">≣</button>
+    <b>Speed Sets</b>
+  </div>
   <div id="speedDropdown">
     <div id="speedSetNames">
       <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
@@ -316,12 +323,14 @@ function defineVideoController() {
       .querySelector("#controller")
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
+    this.btnOpenMenu = shadow.querySelector("[data-action='openMenu']");
     this.speedIndicator = shadow.querySelector("#speedDisplay");
     updateSpeedIndicator(this, speed);
+    this.controls = shadow.querySelector("#controls");
+    this.menu = shadow.querySelector("#menu");
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.speedList = shadow.querySelector("#speedList");
-    this.btnListSpeeds = shadow.querySelector("[data-action='listspeeds']");
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
@@ -802,10 +811,12 @@ function runAction(action, value, e) {
       //   log("Reset speed", 5);
       //   resetSpeed(v, 1.0);
       //   break
-      case "listspeeds":
+      case "openMenu":
         log("list speeds", 5);
         v.avs.speedDropdown.classList.toggle("show");
-        v.avs.btnListSpeeds.classList.toggle("on");
+        v.avs.controls.classList.toggle("show");
+        v.avs.menu.classList.toggle("show");
+        v.avs.btnOpenMenu.classList.toggle("on");
         //TODO unshow when avs-hidden
         break
       case "setNextSet":
@@ -819,7 +830,7 @@ function runAction(action, value, e) {
       case "jumpspeed":
         log("jump speed:"+value, 5);
         v.avs.speedDropdown.classList.toggle("show");
-        v.avs.btnListSpeeds.classList.toggle("on");
+        v.avs.btnOpenMenu.classList.toggle("on");
         setSpeed(v, value)
         break
         //TODO unshow when avs-hidden
