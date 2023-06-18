@@ -119,7 +119,7 @@ var setKeyBindings = function(action, value) {
 var formatSpeedIndicator = function(speed, arr = tc.settings.speedSets[tc.settings.speedSetChosen], idx = arr.findIndex(([num]) => num == speed)) {
   let name = arr?.[idx]?.[1] ?? "--";
   let percent = speed * 100;
-  return injectTemplate({
+  return `<span>${injectTemplate({
     action: "drag",
     name,
     percent: percent.toFixed(0) + "%",
@@ -128,14 +128,17 @@ var formatSpeedIndicator = function(speed, arr = tc.settings.speedSets[tc.settin
     speed,
     speed2: Number(speed).toFixed(2),
     speed3: Number(speed).toFixed(3)
-  });
+  })}</span>`;
 };
 var updateSpeedIndicator = function(context, speed) {
-  context = context.speedIndicator;
+  context = context.textDisplay;
   context.classList.remove("highlight");
   context.classList.add("highlight");
   context.setHTML(formatSpeedIndicator(speed));
   setTimeout(() => context.classList.remove("highlight"), 555);
+};
+var reshowSpeedIndicator = function(context, speed) {
+  context.setHTML(formatSpeedIndicator(speed));
 };
 var setStoredSpeed = function(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -240,23 +243,26 @@ var defineVideoController = function() {
   style="top:${top};left:${left};max-height:${height};opacity:${tc.settings.controllerOpacity}"
 >
   <div id="topLine">
-    <button data-action="openMenu" style="opacity:0.7">\u2699</button>
-    <div id="speedDisplay" data-action="drag">--</div>
+    <div id="textDisplay" data-action="drag">--</div>
   </div>
-  <div id="controls" class="show">
-    <button data-action="rewind" class="rw">\xAB</button>
-    <button data-action="slower">&minus;</button>
-    <button data-action="faster">&plus;</button>
-    <button data-action="advance" class="rw">\xBB</button>
-    <button data-action="blank" class="rw">?</button>
-  </div>
-  <div id="menu">
-    <button data-action="openSpeedDropdown" class="on">\u2263</button>
-    <b>Speed Sets</b>
+  <div id="controls">
+    <span id="quick" class="show">
+      <button data-action="rewind" class="rw">\xAB</button>
+      <button data-action="slower">&minus;</button>
+      <button data-action="faster">&plus;</button>
+      <button data-action="advance" class="rw">\xBB</button>
+      <button data-action="-" class="rw" style="visibility:hidden;">-</button>
+      <button data-action="open config">\u25BC</button>
+    </span>
+    <span id="config">
+      <button data-action="" class="on">\u2263</button>
+      <b>Speed Sets</b>
+      <button data-action="close config" style="opacity:0.7">\u25B2</button>
+    </span>
   </div>
   <div id="speedDropdown">
     <div id="speedSetNames">
-      <button data-action="setPrevSet" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="setNextSet" class="rw">></button>
+      <button data-action="prev set" class="rw"><</button><span id="speedSetChosen">${tc.settings.speedSetChosen}</span><button data-action="next set" class="rw">></button>
     </div>
     <div id="speedList">${speedList}</div>
   </div>
@@ -272,14 +278,19 @@ var defineVideoController = function() {
         runAction(e.currentTarget.dataset["action"], e.currentTarget.dataset["value"] || getKeyBindings(e.currentTarget.dataset["action"]), e);
         e.stopPropagation();
       }, true);
+      button.addEventListener("mouseover", (e) => {
+        shadow.querySelector("#textDisplay").setHTML(`<b class="info">${e.currentTarget.dataset["action"]}</b>`);
+      }, true);
+      button.addEventListener("mouseout", (e) => {
+        reshowSpeedIndicator(shadow.querySelector("#textDisplay"), speed);
+      }, true);
     });
     shadow.querySelector("#controller").addEventListener("click", (e) => e.stopPropagation(), false);
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
-    this.btnOpenMenu = shadow.querySelector("[data-action='openMenu']");
-    this.speedIndicator = shadow.querySelector("#speedDisplay");
+    this.textDisplay = shadow.querySelector("#textDisplay");
     updateSpeedIndicator(this, speed);
-    this.controls = shadow.querySelector("#controls");
-    this.menu = shadow.querySelector("#menu");
+    this.quick = shadow.querySelector("#quick");
+    this.config = shadow.querySelector("#config");
     this.speedDropdown = shadow.querySelector("#speedDropdown");
     this.speedSetChosen = shadow.querySelector("#speedSetChosen");
     this.speedList = shadow.querySelector("#speedList");
@@ -650,25 +661,31 @@ var runAction = function(action, value, e) {
         log("Decrease speed", 5);
         changeSpeed(v, "-");
         break;
-      case "openMenu":
-        log("list speeds", 5);
-        v.avs.speedDropdown.classList.toggle("show");
-        v.avs.controls.classList.toggle("show");
-        v.avs.menu.classList.toggle("show");
-        v.avs.btnOpenMenu.classList.toggle("on");
+      case "open config":
+        log("open config", 5);
+        v.avs.speedDropdown.classList.add("show");
+        v.avs.quick.classList.remove("show");
+        v.avs.config.classList.add("show");
         break;
-      case "setNextSet":
-        log("setPrevSet", 5);
+      case "close config":
+        log("close config", 5);
+        v.avs.speedDropdown.classList.remove("show");
+        v.avs.config.classList.remove("show");
+        v.avs.quick.classList.add("show");
+        break;
+      case "next set":
+        log("next set", 5);
         switchSpeedSet(v, 1);
         break;
-      case "setPrevSet":
-        log("setPrevSet", 5);
+      case "prev set":
+        log("prev set", 5);
         switchSpeedSet(v, -1);
         break;
       case "jumpspeed":
         log("jump speed:" + value, 5);
-        v.avs.speedDropdown.classList.toggle("show");
-        v.avs.btnOpenMenu.classList.toggle("on");
+        v.avs.quick.classList.add("show");
+        v.avs.config.classList.remove("show");
+        v.avs.speedDropdown.classList.remove("show");
         setSpeed(v, value);
         break;
       case "display":
