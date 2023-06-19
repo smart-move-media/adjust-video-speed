@@ -255,7 +255,7 @@ var defineVideoController = function() {
       <button data-action="open config">\u25BC</button>
     </span>
     <span id="config">
-      <button data-action="" class="on">\u2263</button>
+      <button data-action="speed sets" class="on">\u2263</button>
       <b>Speed Sets</b>
       <button data-action="close config" style="opacity:0.7">\u25B2</button>
     </span>

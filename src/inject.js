@@ -282,7 +282,7 @@ function defineVideoController() {
       <button data-action="open config">▼</button>
     </span>
     <span id="config">
-      <button data-action="" class="on">≣</button>
+      <button data-action="speed sets" class="on">≣</button>
       <b>Speed Sets</b>
       <button data-action="close config" style="opacity:0.7">▲</button>
     </span>
