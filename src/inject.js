@@ -118,9 +118,6 @@ function updateSpeedIndicator(context, speed) {
   context.setHTML( formatSpeedIndicator(speed) );
   setTimeout( ()=> context.classList.remove('highlight'), 555)
 }
-function reshowSpeedIndicator(context, speed) {
-  context.setHTML( formatSpeedIndicator(speed) );
-}
 
 function setStoredSpeed(target) {
   storedSpeed = tc.settings.playersSpeed[target.currentSrc];
@@ -324,14 +321,18 @@ function defineVideoController() {
         button.addEventListener(
           "mouseover",
           (e) => {
-            shadow.querySelector("#textDisplay").setHTML( `<b class="info">${e.currentTarget.dataset["action"]}</b>` )
+            let dataset = e.currentTarget.dataset["action"]
+            if (dataset === "jumpspeed") {
+              dataset = e.currentTarget.dataset["value"]
+            }
+            shadow.querySelector("#textDisplay").setHTML( `<b class="info">${dataset}</b>` )
           },
           true
         );
         button.addEventListener(
           "mouseout",
           (e) => {
-            reshowSpeedIndicator(shadow.querySelector("#textDisplay"), speed);
+            shadow.querySelector("#textDisplay").setHTML( formatSpeedIndicator(speed) )
           },
           true
         );
