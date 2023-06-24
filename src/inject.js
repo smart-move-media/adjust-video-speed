@@ -92,7 +92,7 @@ let injectTemplate =(obj)=>
   tc.settings.speedTemplate
     .replace(/\${(.*?)}/g, (x,g)=> obj[g])
 function formatSpeedIndicator(
-  speed,
+  speed = storedSpeed,
   arr = tc.settings.speedSets[tc.settings.speedSetChosen],
   idx = arr.findIndex(([num,])=> num == speed),
 ) {
@@ -115,18 +115,18 @@ function updateSpeedIndicator(context, speed) {
   context = context.textDisplay
   context.classList.remove('highlight');
   context.classList.add('highlight');
-  context.setHTML( formatSpeedIndicator(speed) );
+  context.setHTML( formatSpeedIndicator(tc.settings.lastSpeed) );
   setTimeout( ()=> context.classList.remove('highlight'), 555)
 }
 
 function setStoredSpeed(target) {
-  storedSpeed = tc.settings.playersSpeed[target.currentSrc];
-  if (tc.settings.rememberSpeed) {
+  if (tc.settings.recallGlobalSpeed) {
     storedSpeed = tc.settings.lastSpeed;
-    log(`Recalled stored speed due to rememberSpeed being enabled: ${storedSpeed}`, 5);
+    log(`Recalled stored speed due to recallGlobalSpeed being enabled: ${storedSpeed}`, 5);
   } else {
+    storedSpeed = tc.settings.playersSpeed[target.currentSrc];
     if (!storedSpeed) {
-      log("Setting stored speed to 1.0; rememberSpeed is disabled", 5);
+      log("Setting stored speed to 1.0; recallGlobalSpeed is disabled", 5);
       storedSpeed = 1.0;
     }
     setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
@@ -149,7 +149,6 @@ function defineVideoController() {
     speedValues[ speedSetNames[idx] ] = vArr
   }
   // Data structures
-  // ---------------
   // videoController (JS object) instances:
   //   video = AUDIO/VIDEO DOM element
   //   parent = A/V DOM element's parentElement OR
@@ -161,10 +160,7 @@ function defineVideoController() {
   // added to AUDIO / VIDEO DOM elements
   //    avs = reference to the videoController
   tc.videoController = function (target, parent) {
-    if (target.avs) {
-      return target.avs;
-    }
-
+    if (target.avs) return target.avs
     tc.mediaElements.push(target);
     this.video = target;
     this.parent = target.parentElement || parent;
@@ -178,7 +174,7 @@ function defineVideoController() {
     function mediaEventAction(event) {
       setStoredSpeed(event.target)
       // TODO: Check if explicitly setting the playback rate to 1.0 is
-      // necessary when rememberSpeed is disabled (this may accidentally
+      // necessary when recallGlobalSpeed is disabled (this may accidentally
       // override a website's intentional initial speed setting interfering
       // with the site's default behavior)
       log("mediaEventAction~Explicitly setting playbackRate to: " + storedSpeed, 4);
@@ -332,7 +328,7 @@ function defineVideoController() {
         button.addEventListener(
           "mouseout",
           (e) => {
-            shadow.querySelector("#textDisplay").setHTML( formatSpeedIndicator(speed) )
+            shadow.querySelector("#textDisplay").setHTML( formatSpeedIndicator() )
           },
           true
         );
@@ -449,7 +445,6 @@ function setupListener() {
     // a video controller attached to it.  If we do, ignore it.
     if (!video.avs)
       return;
-    var src = video.currentSrc;
     var speed = Number(video.playbackRate).toFixed(7);
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
@@ -457,11 +452,11 @@ function setupListener() {
 
     log("Updating controller with new speed", 5);
     updateSpeedIndicator(video.avs, speed);
-    tc.settings.playersSpeed[src] = speed;
+    tc.settings.playersSpeed[video.currentSrc] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
 
-      log("Storing lastSpeed in settings for the rememberSpeed feature", 5);
+      log("Storing lastSpeed in settings for the recallGlobalSpeed feature", 5);
       tc.settings.lastSpeed = speed;
       log("Syncing chrome settings for lastSpeed", 5);
       chrome.storage.sync.set({ lastSpeed: speed }, function () {
@@ -470,7 +465,7 @@ function setupListener() {
     } else
       log(`Speed update to ${speed} ignored due to ifSpeedIsNormalDontSaveUnlessWeSetIt`,5);
     // show the controller for 1000ms if it's hidden.
-    runAction("blink", null, null);
+    // runAction("blink", null, null);
   }
 
   document.addEventListener(
@@ -791,6 +786,7 @@ function setSpeed(video, speed) {
   }
   updateSpeedIndicator(video.avs, speed);
   tc.settings.lastSpeed = speed;
+  // setStoredSpeed(video)
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
 }

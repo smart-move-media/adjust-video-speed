@@ -2,7 +2,7 @@ export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 export let tcDefaults = {
   version: "0.8.10",
   lastSpeed: 1.0,
-  rememberSpeed: true,
+  recallGlobalSpeed: true,
   audioBoolean: false,
   controllerOpacity: 0.6,
   enabled: true,
