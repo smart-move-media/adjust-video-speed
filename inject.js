@@ -134,10 +134,7 @@ var updateSpeedIndicator = function(context, speed) {
   context = context.textDisplay;
   context.classList.remove("highlight");
   context.classList.add("highlight");
-  console.log(speed);
-  console.log(storedSpeed);
-  console.log(tc.settings.lastSpeed);
-  context.setHTML(formatSpeedIndicator(tc.settings.lastSpeed));
+  context.setHTML(formatSpeedIndicator(speed));
   setTimeout(() => context.classList.remove("highlight"), 555);
 };
 var setStoredSpeed = function(target) {
@@ -291,7 +288,6 @@ var defineVideoController = function() {
     shadow.querySelector("#controller").addEventListener("click", (e) => e.stopPropagation(), false);
     shadow.querySelector("#controller").addEventListener("mousedown", (e) => e.stopPropagation(), false);
     this.textDisplay = shadow.querySelector("#textDisplay");
-    updateSpeedIndicator(this, speed);
     this.quick = shadow.querySelector("#quick");
     this.config = shadow.querySelector("#config");
     this.speedDropdown = shadow.querySelector("#speedDropdown");
@@ -299,6 +295,7 @@ var defineVideoController = function() {
     this.speedList = shadow.querySelector("#speedList");
     var fragment = document2.createDocumentFragment();
     fragment.appendChild(wrapper);
+    updateSpeedIndicator(this, speed);
     switch (true) {
       case location.hostname == "www.amazon.com":
       case location.hostname == "www.reddit.com":
@@ -371,7 +368,6 @@ var setupListener = function() {
     var ident = `${video.className} ${video.id} ${video.name} ${video.url} ${video.offsetWidth}x${video.offsetHeight}`;
     log("Playback rate changed to " + speed + ` for: ${ident}`, 4);
     log("Updating controller with new speed", 5);
-    updateSpeedIndicator(video.avs, speed);
     tc.settings.playersSpeed[video.currentSrc] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || !tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -381,8 +377,10 @@ var setupListener = function() {
       chrome.storage.sync.set({ lastSpeed: speed }, function() {
         log("Speed setting saved: " + speed, 5);
       });
-    } else
+    } else {
       log(`Speed update to ${speed} ignored due to ifSpeedIsNormalDontSaveUnlessWeSetIt`, 5);
+    }
+    updateSpeedIndicator(video.avs, speed);
   }
   document.addEventListener("ratechange", function(event) {
     if (coolDown) {
@@ -628,8 +626,9 @@ var setSpeed = function(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`);
   }
-  updateSpeedIndicator(video.avs, speed);
   tc.settings.lastSpeed = speed;
+  updateSpeedIndicator(video.avs, speed);
+  setStoredSpeed(video);
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
 };

@@ -98,6 +98,7 @@ function formatSpeedIndicator(
 ) {
   let name = arr?.[idx]?.[1] ?? '--'
   let percent = (speed * 100)
+
   return /*html*/`<span>${injectTemplate({
     action: 'drag', // RESERVED
     name: name,
@@ -115,7 +116,13 @@ function updateSpeedIndicator(context, speed) {
   context = context.textDisplay
   context.classList.remove('highlight');
   context.classList.add('highlight');
-  context.setHTML( formatSpeedIndicator(tc.settings.lastSpeed) );
+
+
+  // console.log('speed',speed);
+  // console.log('storedSpeed', storedSpeed);
+  // console.log('tc.settings.lastSpeed', tc.settings.lastSpeed);
+
+  context.setHTML( formatSpeedIndicator(speed) );
   setTimeout( ()=> context.classList.remove('highlight'), 555)
 }
 
@@ -341,7 +348,6 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.textDisplay = shadow.querySelector("#textDisplay");
-    updateSpeedIndicator(this, speed);
     this.quick = shadow.querySelector("#quick");
     this.config = shadow.querySelector("#config");
     this.speedDropdown = shadow.querySelector("#speedDropdown");
@@ -349,6 +355,8 @@ function defineVideoController() {
     this.speedList = shadow.querySelector("#speedList");
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
+    
+    updateSpeedIndicator(this, speed)
 
     // specific website workarounds
     switch (true) {
@@ -451,7 +459,6 @@ function setupListener() {
     //console.log(event);
 
     log("Updating controller with new speed", 5);
-    updateSpeedIndicator(video.avs, speed);
     tc.settings.playersSpeed[video.currentSrc] = speed;
     let wasUs = event.detail && event.detail.origin === "videoSpeed";
     if (wasUs || ! tc.settings.ifSpeedIsNormalDontSaveUnlessWeSetIt || speed != 1) {
@@ -462,10 +469,12 @@ function setupListener() {
       chrome.storage.sync.set({ lastSpeed: speed }, function () {
         log("Speed setting saved: " + speed, 5);
       });
-    } else
+    } else {
       log(`Speed update to ${speed} ignored due to ifSpeedIsNormalDontSaveUnlessWeSetIt`,5);
+    }
     // show the controller for 1000ms if it's hidden.
     // runAction("blink", null, null);
+    updateSpeedIndicator(video.avs, speed);
   }
 
   document.addEventListener(
@@ -784,9 +793,9 @@ function setSpeed(video, speed) {
     video.playbackRate = speed;
     log(`not forced ${speed}`)
   }
-  updateSpeedIndicator(video.avs, speed);
   tc.settings.lastSpeed = speed;
-  // setStoredSpeed(video)
+  updateSpeedIndicator(video.avs, speed);
+  setStoredSpeed(video)
   refreshCoolDown();
   log("setSpeed finished: " + speed, 5);
 }

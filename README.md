@@ -109,6 +109,7 @@ If you want to edit the `inject.js` & `options.js`, do so only in `./src`
   * scroll only the speedList buttons, & keep top contolls fixed
     + most CSS in `shadow.css`, but `inspect.js` has `id="controller"` & `buildSpeedDropdown()`
   * return prefs UI
+  * display time to rewind & advance on hover (eg +5sec) & activation (eg "set to 149sec")
 
 ### License
 
