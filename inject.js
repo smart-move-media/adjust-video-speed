@@ -10,7 +10,7 @@ var tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<b style="min-width:2.2em;">${speed3}</b><i class="hoverShow" style="min-width:3em;">: ${name}</i>',
+  speedTemplate: '<b style="min-width:2.2em;">${speed3}</b><i class="hoverShow" style="min-width:3em;"> : ${name}</i>',
   speedSets: {
     common: [
       [0.25, "turtle"],
@@ -106,14 +106,14 @@ var log = function(msg, level = 4) {
       console.trace();
   }
 };
-var getKeyBindings = function(action, what = "value") {
+var getKeyBindingData = function(action, what = "value") {
   try {
     return tc.settings.keyBindings.find((item) => item.action === action)[what];
   } catch (e) {
     return false;
   }
 };
-var setKeyBindings = function(action, value) {
+var setKeyBindingValue = function(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)["value"] = value;
 };
 var formatSpeedIndicator = function(speed = storedSpeed, arr = tc.settings.speedSets[tc.settings.speedSetChosen], idx = arr.findIndex(([num]) => num == speed)) {
@@ -132,10 +132,13 @@ var formatSpeedIndicator = function(speed = storedSpeed, arr = tc.settings.speed
 };
 var updateSpeedIndicator = function(context, speed) {
   context = context.textDisplay;
-  context.classList.remove("highlight");
-  context.classList.add("highlight");
+  if (oldSpeedIndicatorSpeed !== speed) {
+    context.classList.remove("highlight");
+    oldSpeedIndicatorSpeed = speed;
+    context.classList.add("highlight");
+    setTimeout(() => context.classList.remove("highlight"), 555);
+  }
   context.setHTML(formatSpeedIndicator(speed));
-  setTimeout(() => context.classList.remove("highlight"), 555);
 };
 var setStoredSpeed = function(target) {
   if (tc.settings.recallGlobalSpeed) {
@@ -147,7 +150,7 @@ var setStoredSpeed = function(target) {
       log("Setting stored speed to 1.0; recallGlobalSpeed is disabled", 5);
       storedSpeed = 1;
     }
-    setKeyBindings("reset", getKeyBindings("fast"));
+    setKeyBindingValue("reset", getKeyBindingData("fast"));
   }
 };
 var defineVideoController = function() {
@@ -251,9 +254,9 @@ var defineVideoController = function() {
       <button data-action="open config">\u25BC</button>
     </span>
     <span id="config">
-      <button data-action="speed sets" class="on">\u2263</button>
+      <button data-action="speed sets" class="on" disabled>\u2263</button>
       <b>Speed Sets</b>
-      <button data-action="close config" style="opacity:0.7">\u25B2</button>
+      <button data-action="close config"">\u25B2</button>
     </span>
   </div>
   <div id="speedDropdown">
@@ -271,13 +274,23 @@ var defineVideoController = function() {
     }, true);
     shadow.querySelectorAll("button").forEach(function(button) {
       button.addEventListener("click", (e) => {
-        runAction(e.currentTarget.dataset["action"], e.currentTarget.dataset["value"] || getKeyBindings(e.currentTarget.dataset["action"]), e);
+        runAction(e.currentTarget.dataset["action"], e.currentTarget.dataset["value"] || getKeyBindingData(e.currentTarget.dataset["action"]), e);
         e.stopPropagation();
       }, true);
       button.addEventListener("mouseover", (e) => {
         let dataset = e.currentTarget.dataset["action"];
-        if (dataset === "jumpspeed") {
-          dataset = e.currentTarget.dataset["value"];
+        switch (dataset) {
+          case "jumpspeed":
+            dataset = e.currentTarget.dataset["value"];
+            break;
+          case "rewind":
+            dataset = `rewind -${getKeyBindingData(e.currentTarget.dataset["action"])}`;
+            break;
+          case "advance":
+            dataset = `advance +${getKeyBindingData(e.currentTarget.dataset["action"])}`;
+            break;
+          default:
+            break;
         }
         shadow.querySelector("#textDisplay").setHTML(`<b class="info">${dataset}</b>`);
       }, true);
@@ -827,4 +840,5 @@ chrome.storage.sync.get(tc.settings, function(storage) {
   initializeWhenReady(document);
 });
 var injectTemplate = (obj) => tc.settings.speedTemplate.replace(/\${(.*?)}/g, (x, g) => obj[g]);
+var oldSpeedIndicatorSpeed = 1;
 var coolDown = false;

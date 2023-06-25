@@ -9,7 +9,7 @@ export let tcDefaults = {
   forceLastSavedSpeed: false,
   ifSpeedIsNormalDontSaveUnlessWeSetIt: false,
   startHidden: false,
-  speedTemplate: '<b style="min-width:2.2em;">${speed3}</b><i class="hoverShow" style="min-width:3em;">: ${name}</i>',
+  speedTemplate: '<b style="min-width:2.2em;">${speed3}</b><i class="hoverShow" style="min-width:3em;"> : ${name}</i>',
   //! ensure speeds are listed slowest to fastest
   // Max playback speed in Chrome is set to 16:
   // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
@@ -87,6 +87,11 @@ export let tcDefaults = {
     ],
   },
   speedSetChosen: "common",
+  // keyBindings not only config keyboard letter to trigger, but also
+  // assign 'value' to those actions, even if they are activiated by
+  // UI <button>.   So these must be present even if you don't intend to
+  // use the keyboard assignments; just change the key to an unsued key.
+  //TODO activate reset & fast
   keyBindings: [
     { action: "display", key: 86, value: 0, force: false, predefined: true }, // V
     { action: "slower", key: 83, value: 0.1, force: false, predefined: true }, // S
@@ -94,7 +99,7 @@ export let tcDefaults = {
     { action: "rewind", key: 90, value: 10, force: false, predefined: true }, // Z
     { action: "advance", key: 88, value: 10, force: false, predefined: true }, // X
     // { action: "reset", key: 82, value: 1, force: false, predefined: true }, // R
-    // { action: "fast", key: 71, value: 1.8, force: false, predefined: true } // G
+    // { action: "fast", key: 71, value: 1.4, force: false, predefined: true } // G
   ],
   blacklist: `www.instagram.com
   twitter.com

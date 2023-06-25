@@ -75,14 +75,14 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   initializeWhenReady(document);
 });
 
-function getKeyBindings(action, what = "value") {
+function getKeyBindingData(action, what = "value") {
   try {
     return tc.settings.keyBindings.find((item) => item.action === action)[what];
   } catch (e) {
     return false;
   }
 }
-function setKeyBindings(action, value) {
+function setKeyBindingValue(action, value) {
   tc.settings.keyBindings.find((item) => item.action === action)[
     "value"
   ] = value;
@@ -112,18 +112,19 @@ function formatSpeedIndicator(
     // speed4: Number(speed).toFixed(4),
   })}</span>`
 }
+let oldSpeedIndicatorSpeed = 1.0
 function updateSpeedIndicator(context, speed) {
   context = context.textDisplay
-  context.classList.remove('highlight');
-  context.classList.add('highlight');
-
-
+  if (oldSpeedIndicatorSpeed !== speed) {
+    context.classList.remove('highlight')
+    oldSpeedIndicatorSpeed = speed
+    context.classList.add('highlight')
+    setTimeout( ()=> context.classList.remove('highlight'), 555)
+  }
   // console.log('speed',speed);
   // console.log('storedSpeed', storedSpeed);
   // console.log('tc.settings.lastSpeed', tc.settings.lastSpeed);
-
   context.setHTML( formatSpeedIndicator(speed) );
-  setTimeout( ()=> context.classList.remove('highlight'), 555)
 }
 
 function setStoredSpeed(target) {
@@ -136,7 +137,7 @@ function setStoredSpeed(target) {
       log("Setting stored speed to 1.0; recallGlobalSpeed is disabled", 5);
       storedSpeed = 1.0;
     }
-    setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
+    setKeyBindingValue("reset", getKeyBindingData("fast")); // resetSpeed = fastSpeed
   }
 }
 function defineVideoController() {
@@ -282,9 +283,9 @@ function defineVideoController() {
       <button data-action="open config">▼</button>
     </span>
     <span id="config">
-      <button data-action="speed sets" class="on">≣</button>
+      <button data-action="speed sets" class="on" disabled>≣</button>
       <b>Speed Sets</b>
-      <button data-action="close config" style="opacity:0.7">▲</button>
+      <button data-action="close config"">▲</button>
     </span>
   </div>
   <div id="speedDropdown">
@@ -314,7 +315,7 @@ function defineVideoController() {
           (e) => {
             runAction(
               e.currentTarget.dataset["action"],
-              e.currentTarget.dataset["value"] || getKeyBindings(e.currentTarget.dataset["action"]),
+              e.currentTarget.dataset["value"] || getKeyBindingData(e.currentTarget.dataset["action"]),
               e
             );
             e.stopPropagation();
@@ -325,8 +326,18 @@ function defineVideoController() {
           "mouseover",
           (e) => {
             let dataset = e.currentTarget.dataset["action"]
-            if (dataset === "jumpspeed") {
-              dataset = e.currentTarget.dataset["value"]
+            switch (dataset) {
+              case 'jumpspeed':
+                dataset = e.currentTarget.dataset["value"]
+                break;
+              case 'rewind':
+                dataset = `rewind -${getKeyBindingData(e.currentTarget.dataset["action"])}`
+                break;
+              case 'advance':
+                dataset = `advance +${getKeyBindingData(e.currentTarget.dataset["action"])}`
+                break;
+              default:
+                break;
             }
             shadow.querySelector("#textDisplay").setHTML( `<b class="info">${dataset}</b>` )
           },
@@ -926,21 +937,21 @@ function pause(v) {
 
 // function resetSpeed(v, target) {
 //   if (v.playbackRate === target) {
-//     if (v.playbackRate === getKeyBindings("reset")) {
+//     if (v.playbackRate === getKeyBindingData("reset")) {
 //       if (target !== 1.0) {
 //         log("Resetting playback speed to 1.0", 4);
 //         setSpeed(v, 1.0);
 //       } else {
 //         log('Toggling playback speed to "fast" speed', 4);
-//         setSpeed(v, getKeyBindings("fast"));
+//         setSpeed(v, getKeyBindingData("fast"));
 //       }
 //     } else {
 //       log('Toggling playback speed to "reset" speed', 4);
-//       setSpeed(v, getKeyBindings("reset"));
+//       setSpeed(v, getKeyBindingData("reset"));
 //     }
 //   } else {
 //     log('Toggling playback speed to "reset" speed', 4);
-//     setKeyBindings("reset", v.playbackRate);
+//     setKeyBindingValue("reset", v.playbackRate);
 //     setSpeed(v, target);
 //   }
 // }

@@ -127,10 +127,10 @@ button:active {
   font-weight: bold;
 }
 button.rw {
-  opacity: 0.75;
+  opacity: 0.7;
 }
 button.hideButton {
-  opacity: 0.75;
+  opacity: 0.7;
   /* margin-right: 2px; */
 }
 #speedList > button {
@@ -145,6 +145,13 @@ button.on {
   opacity: 1;
   color: black;
   background: #21f32f;
+}
+button:disabled,
+button.on:disabled {
+  cursor: default;
+  background-color: dimgrey;
+  color: linen;
+  opacity: 0.7;
 }
 
 #textDisplay {
