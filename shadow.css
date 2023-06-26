@@ -13,10 +13,10 @@
   padding: 4px;
   margin: 10px 10px 10px 15px;
   border-radius: 6px;
-  
+
   background: black;
   color: white;
-  
+
   cursor: default;
   z-index: 999999999;
   overflow: auto;
@@ -107,7 +107,7 @@ button {
   font-weight: bold;
 
   border-radius: 5px;
-  padding: 5px 5px 3px 5px;
+  padding: 2px 5px 5px 5px;
   line-height: 16px;
   border: 0px solid white;
   /* margin: 0px .3px 4px .3px; */
