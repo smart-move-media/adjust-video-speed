@@ -10,7 +10,7 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 ~~~## _[Install Chrome Extension](https://github.com/smart-move-media/adjust-video-speed)
 ~~~
 
-## Usage
+## Instructions
 **Not in Chrome Store yet!**
 
 ### Manual Installation
@@ -26,22 +26,25 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
   5. ( Load unpacked ) button
   6. open where you cloned/unpacked zip to install
 
-\*\* Once the extension is installed, simply navigate to any page that offers HTML5 video ([example](http://www.youtube.com/watch?v=E9FxNzv1Tr8)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
-controls to accelerate, slowdown, and quickly rewind or advance the video. Or, even better, use your keyboard:
+## Usage
 
-- **S** - decrease playback speed.
-- **D** - increase playback speed.
-- **R** - reset playback speed to 1.0x.
-- **Z** - rewind video by 10 seconds.
-- **X** - advance video by 10 seconds.
-- **G** - toggle between current and user configurable preferred speed.
-- **V** - show/hide the controller.
+\*\* After instalation, simply navigate to any page that offers HTML5 video (examples: [rumble](https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html), [odysee](https://odysee.com/@fireship:6/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu:1), [YouTube]()), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
+controls to accelerate, slowdown, and quickly rewind or advance the video.
+
+### Keyboard Shortcuts
+
+- **S** - decrease playback speed
+- **D** - increase playback speed
+- **R** - reset playback speed to 1.0x
+- **Z** - rewind video by 10 seconds
+- **X** - advance video by 10 seconds
+- **V** - show/hide the controller
 
 This extension listens both for lower and upper case values (i.e. you can use `Shift-<shortcut>`) if there is other functionality assigned to the lowercase key.
 
-You can customize and reassign the default shortcut keys in the extensions settings page as well as add additional shortcut keys to match your preferences by editing the JSON.
+### Configuration
 
-## Configuration
+You can customize and reassign the default shortcut keys in the extensions settings page as well as add additional shortcut keys to match your preferences by editing the JSON.
 
 1. In a new tab, navigate to `chrome://extensions`
 2. Find "Adjust Video Speed" extension
@@ -52,10 +55,10 @@ You can customize and reassign the default shortcut keys in the extensions setti
 
 ## FAQ
 
-**[Much of code from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
+**[Much of code & README is from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
 
 His version featured incrementing and decrementing by a set amount.  If that is what you prefer over an array configuration, then perhaps try his from the Chrome store (disable my version first).
-Also some code from [Mitch Capper](https://github.com/mitchcapper/videospeed)
+Also some code added from [Mitch Capper](https://github.com/mitchcapper/videospeed)
 
 **Science of accelerated playback**: _TL;DR: faster playback translates to better engagement and retention._
 
@@ -77,18 +80,20 @@ Many viewers report that [accelerated viewing keeps their attention longer](http
 
 The SVG files in the `/icons` folder are **not used** by Chrome, but are used to create the PNG files:
 ```bash
-  inkscape -w 16 -h 16 -o 16.png icon128.svg
-  inkscape -w 32 -h 32 -o 32.png icon128.svg
-  inkscape -w 48 -h 48 -o 48.png icon128.svg
-  inkscape -w 128 -h 128 -o 128.png icon128.svg
-  inkscape -w 16 -h 16 -o 16.png icon128_disabled.svg
-  inkscape -w 32 -h 32 -o 32.png icon128_disabled.svg
-  inkscape -w 48 -h 48 -o 48.png icon128_disabled.svg
+  inkscape -w 16 -h 16 -o icon16.png icon128.svg
+  inkscape -w 32 -h 32 -o icon32.png icon128.svg
+  inkscape -w 48 -h 48 -o icon48.png icon128.svg
+  inkscape -w 128 -h 128 -o icon128.png icon128.svg
+  inkscape -w 16 -h 16 -o icon16_disabled.png icon128_disabled.svg
+  inkscape -w 32 -h 32 -o icon32_disabled.png icon128_disabled.svg
+  inkscape -w 48 -h 48 -o icon48_disabled.png icon128_disabled.svg
+  wait
   optipng *.png
 ```
 
 ### ToDo
 
+  * fix disabled mode for icons
   * highlight chosen button
   * scroll only the speedList buttons, & keep top contolls fixed
     + most CSS in `shadow.css`, but `inspect.js` has `id="controller"` & `buildSpeedDropdown()`
