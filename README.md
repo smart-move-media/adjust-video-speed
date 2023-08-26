@@ -10,7 +10,7 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 ~~~## _[Install Chrome Extension](https://github.com/smart-move-media/adjust-video-speed)
 ~~~
 
-## Usage
+## Instructions
 **Not in Chrome Store yet!**
 
 ### Manual Installation
@@ -26,22 +26,25 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
   5. ( Load unpacked ) button
   6. open where you cloned/unpacked zip to install
 
-\*\* Once the extension is installed, simply navigate to any page that offers HTML5 video ([example](http://www.youtube.com/watch?v=E9FxNzv1Tr8)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
-controls to accelerate, slowdown, and quickly rewind or advance the video. Or, even better, use your keyboard:
+## Usage
 
-- **S** - decrease playback speed.
-- **D** - increase playback speed.
-- **R** - reset playback speed to 1.0x.
-- **Z** - rewind video by 10 seconds.
-- **X** - advance video by 10 seconds.
-- **G** - toggle between current and user configurable preferred speed.
-- **V** - show/hide the controller.
+\*\* After instalation, simply navigate to any page that offers HTML5 video (examples: [rumble](https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html), [odysee](https://odysee.com/@fireship:6/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu:1), [YouTube]()), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
+controls to accelerate, slowdown, and quickly rewind or advance the video.
+
+### Keyboard Shortcuts
+
+- **S** - decrease playback speed
+- **D** - increase playback speed
+- **R** - reset playback speed to 1.0x
+- **Z** - rewind video by 10 seconds
+- **X** - advance video by 10 seconds
+- **V** - show/hide the controller
 
 This extension listens both for lower and upper case values (i.e. you can use `Shift-<shortcut>`) if there is other functionality assigned to the lowercase key.
 
-You can customize and reassign the default shortcut keys in the extensions settings page as well as add additional shortcut keys to match your preferences by editing the JSON.
+### Configuration
 
-## Configuration
+You can customize and reassign the default shortcut keys in the extensions settings page as well as add additional shortcut keys to match your preferences by editing the JSON.
 
 1. In a new tab, navigate to `chrome://extensions`
 2. Find "Adjust Video Speed" extension
