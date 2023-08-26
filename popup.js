@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (chrome && chrome["browserAction"] && chrome.browserAction["setIcon"]) {
     chrome.browserAction.setIcon({
       path: {
-        "19": "icons/icon19" + suffix,
-        "38": "icons/icon38" + suffix,
+        "16": "icons/icon16" + suffix,
+        "32": "icons/icon32" + suffix,
         "48": "icons/icon48" + suffix
       }
     });
