@@ -12,30 +12,28 @@
     <script src="options.js"></script>
   </head>
   <body>
-    <header>
-      <h1>Adjust Video Speed optons</h1>
+    <header style="display:flex;align-items:center;
+  ">
+      <img src="icons/icon32.png"/>&nbsp;<h1>Adjust Video Speed optons</h1>
     </header>
 
     <button id="restore">Restore Defaults</button>
     <div id="status"></div>
-    <br /><br />
-
-        <fieldset>
-            <legend>Raw JSON Settings Edit</legend>
-              <code-input
-                lang="JSON"
-                id="rawJson"
-                style="resize:vertical; overflow:auto; height:500px; width:650px;">
-              </code-input>
-              <br />
-              <button id="saveRaw">Save From RawJson</button>
-        </fieldset>
-      </div>
-    </section>
+      <br /><br />
+      <fieldset>
+        <legend>Raw JSON Settings Edit</legend>
+        <code-input
+          lang="JSON"
+          id="rawJson"
+          style="resize:vertical; overflow:auto; height:500px; width:650px;">
+        </code-input>
+        <br />
+        <button id="saveRaw">Save From RawJson</button>
+      </fieldset>
+    </div>
 
     <div id="faq">
       <hr />
-
       <h4>Extension controls not appearing?</h4>
       <p>
         This extension is only compatible with HTML5 audio and video. If you

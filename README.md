@@ -52,10 +52,10 @@ You can customize and reassign the default shortcut keys in the extensions setti
 
 ## FAQ
 
-**[Much of code from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
+**[Much of code & README is from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
 
 His version featured incrementing and decrementing by a set amount.  If that is what you prefer over an array configuration, then perhaps try his from the Chrome store (disable my version first).
-Also some code from [Mitch Capper](https://github.com/mitchcapper/videospeed)
+Also some code added from [Mitch Capper](https://github.com/mitchcapper/videospeed)
 
 **Science of accelerated playback**: _TL;DR: faster playback translates to better engagement and retention._
 
@@ -77,18 +77,20 @@ Many viewers report that [accelerated viewing keeps their attention longer](http
 
 The SVG files in the `/icons` folder are **not used** by Chrome, but are used to create the PNG files:
 ```bash
-  inkscape -w 16 -h 16 -o 16.png icon128.svg
-  inkscape -w 32 -h 32 -o 32.png icon128.svg
-  inkscape -w 48 -h 48 -o 48.png icon128.svg
-  inkscape -w 128 -h 128 -o 128.png icon128.svg
-  inkscape -w 16 -h 16 -o 16.png icon128_disabled.svg
-  inkscape -w 32 -h 32 -o 32.png icon128_disabled.svg
-  inkscape -w 48 -h 48 -o 48.png icon128_disabled.svg
+  inkscape -w 16 -h 16 -o icon16.png icon128.svg
+  inkscape -w 32 -h 32 -o icon32.png icon128.svg
+  inkscape -w 48 -h 48 -o icon48.png icon128.svg
+  inkscape -w 128 -h 128 -o icon128.png icon128.svg
+  inkscape -w 16 -h 16 -o icon16_disabled.png icon128_disabled.svg
+  inkscape -w 32 -h 32 -o icon32_disabled.png icon128_disabled.svg
+  inkscape -w 48 -h 48 -o icon48_disabled.png icon128_disabled.svg
+  wait
   optipng *.png
 ```
 
 ### ToDo
 
+  * fix disabled mode for icons
   * highlight chosen button
   * scroll only the speedList buttons, & keep top contolls fixed
     + most CSS in `shadow.css`, but `inspect.js` has `id="controller"` & `buildSpeedDropdown()`
