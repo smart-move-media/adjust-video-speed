@@ -1,31 +1,33 @@
 # Adjust Video Speed
+\
+![Player](./img/adjust-video-speed.logo.svg)
 
-### WARNING: fork in public beta 2023-09'
+### WARNING: fork in public beta 2023-09
 
-HTML5 video provides a native API to accelerate playback of any video. Some players either hide or limit this functionality.
+HTML5 video provides a native API to accelerate playback of any video. This Chrome extention allows you to change the video speed in different configurations; musical pitch, more fine-grained defaults, or your own custom array.
 
-![Player](https://cloud.githubusercontent.com/assets/2400185/24076745/5723e6ae-0c41-11e7-820c-1d8e814a2888.png)
 
 ~~~## _[Install Chrome Extension](https://github.com/smart-move-media/adjust-video-speed)
 ~~~
 
+## Usage
 **Not in Chrome Store yet!**
 
 ### Manual Installation
 
   1. Go to repo at [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
   2. Download repo:
-    * Click on [<> Code] button in top-middle
-    * bottom of dropdown, choose "Download ZIP"
-  3. In Chrome/Brave/Edge open extentions at [brave://extensions/](brave://extensions/)
-  4. Turn on **Developer mode** switch
+      * Click on green [<> Code] button near top-middle
+      * bottom of dropdown, choose "Download ZIP"
+      * unpack zip
+  3. In Chrome open extentions at [chrome://extensions/](chrome://extensions/)
+      * In [Brave web browser](https://brave.com/) open extentions at [brave://extensions/](brave://extensions/)
+  4. Turn on **Developer mode** switch on top-right
   5. ( Load unpacked ) button
-  6. open where you cloned/unpacked zip
+  6. open where you cloned/unpacked zip to install
 
-## Usage
-
-\*\* Once the extension is installed simply navigate to any page that offers HTML5 video ([example](http://www.youtube.com/watch?v=E9FxNzv1Tr8)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
-controls to accelerate, slowdown, and quickly rewind or advance the video. Or, even better, simply use your keyboard:
+\*\* Once the extension is installed, simply navigate to any page that offers HTML5 video ([example](http://www.youtube.com/watch?v=E9FxNzv1Tr8)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
+controls to accelerate, slowdown, and quickly rewind or advance the video. Or, even better, use your keyboard:
 
 - **S** - decrease playback speed.
 - **D** - increase playback speed.
@@ -50,6 +52,11 @@ You can customize and reassign the default shortcut keys in the extensions setti
 
 ## FAQ
 
+**[Much of code from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
+
+His version featured incrementing and decrementing by a set amount.  If that is what you prefer over an array configuration, then perhaps try his from the Chrome store (disable my version first).
+Also some code from [Mitch Capper](https://github.com/mitchcapper/videospeed)
+
 **Science of accelerated playback**: _TL;DR: faster playback translates to better engagement and retention._
 
 The average adult reads prose text at [250 to 300 words per minute](http://www.paperbecause.com/PIOP/files/f7/f7bb6bc5-2c4a-466f-9ae7-b483a2c0dca4.pdf) (wpm). By contrast, the average rate of speech for English speakers is ~150 wpm,
@@ -66,7 +73,21 @@ Many viewers report that [accelerated viewing keeps their attention longer](http
   to file URLs"
 - Open a new tab and try opening a local file; the controls should show up.
 
-#### ToDo:
+### Development
+
+The SVG files in the `/icons` folder are **not used** by Chrome, but are used to create the PNG files:
+```bash
+  inkscape -w 16 -h 16 -o 16.png icon128.svg
+  inkscape -w 32 -h 32 -o 32.png icon128.svg
+  inkscape -w 48 -h 48 -o 48.png icon128.svg
+  inkscape -w 128 -h 128 -o 128.png icon128.svg
+  inkscape -w 16 -h 16 -o 16.png icon128_disabled.svg
+  inkscape -w 32 -h 32 -o 32.png icon128_disabled.svg
+  inkscape -w 48 -h 48 -o 48.png icon128_disabled.svg
+  optipng *.png
+```
+
+### ToDo
 
   * highlight chosen button
   * scroll only the speedList buttons, & keep top contolls fixed
