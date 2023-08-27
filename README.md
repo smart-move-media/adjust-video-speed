@@ -11,7 +11,7 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 ~~~
 
 ## Instructions
-**Not in Chrome Store yet!**
+***Not in Chrome Store yet!***
 
 ### Manual Installation
 
@@ -20,25 +20,24 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
       * Click on green [<> Code] button near top-middle
       * bottom of dropdown, choose "Download ZIP"
       * unpack zip
-  3. In Chrome open extentions at [chrome://extensions/](chrome://extensions/)
-      * In [Brave web browser](https://brave.com/) open extentions at [brave://extensions/](brave://extensions/)
+  3. In Chrome, open extentions at `chrome://extensions`
+      * In [Brave web browser](https://brave.com/), open extentions at `brave://extensions/`
   4. Turn on **Developer mode** switch on top-right
   5. ( Load unpacked ) button
   6. open where you cloned/unpacked zip to install
 
 ## Usage
 
-\*\* After instalation, simply navigate to any page that offers HTML5 video (examples: [rumble](https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html), [odysee](https://odysee.com/@fireship:6/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu:1), [YouTube]()), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
+\*\* After instalation, simply navigate to any page that offers HTML5 video (examples: [rumble](https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html), [odysee](https://odysee.com/@fireship:6/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu:1), [YouTube](https://youtu.be/DfJrL4LEXz0)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
 controls to accelerate, slowdown, and quickly rewind or advance the video.
 
 ### Keyboard Shortcuts
 
 - **S** - decrease playback speed
 - **D** - increase playback speed
-- **R** - reset playback speed to 1.0x
 - **Z** - rewind video by 10 seconds
 - **X** - advance video by 10 seconds
-- **V** - show/hide the controller
+- **V** - hide/show the controller
 
 This extension listens both for lower and upper case values (i.e. you can use `Shift-<shortcut>`) if there is other functionality assigned to the lowercase key.
 
@@ -57,7 +56,7 @@ You can customize and reassign the default shortcut keys in the extensions setti
 
 **[Much of code & README is from Ilya Grigorik](https://github.com/igrigorik/videospeed)**
 
-His version featured incrementing and decrementing by a set amount.  If that is what you prefer over an array configuration, then perhaps try his from the Chrome store (disable my version first).
+Ilya's version featured incrementing and decrementing by a set amount.  If that is what you prefer over an array configuration, then perhaps try [his from the Chrome Store](https://chrome.google.com/webstore/detail/video-speed-controller/nffaoalbilbmmfgbnbgppjihopabppdk) (disable my version first).
 Also some code added from [Mitch Capper](https://github.com/mitchcapper/videospeed)
 
 **Science of accelerated playback**: _TL;DR: faster playback translates to better engagement and retention._
