@@ -1,6 +1,6 @@
 # Adjust Video Speed
 \
-![Player](./img/adjust-video-speed.logo.svg)
+![Adjust Video Speed logo](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/adjust-video-speed.logo.svg)
 
 ### WARNING: fork in public beta 2023-09
 
@@ -28,8 +28,11 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 
 ## Usage
 
-\*\* After instalation, simply navigate to any page that offers HTML5 video (examples: [rumble](https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html), [odysee](https://odysee.com/@fireship:6/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu:1), [YouTube](https://youtu.be/DfJrL4LEXz0)), and you'll see a speed indicator in top left corner. Hover over the indicator to reveal the
-controls to accelerate, slowdown, and quickly rewind or advance the video.
+After instalation, navigate to any page that offers HTML5 video (examples: <a href="https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html" target="_blank">rumble</a>, <a href="https://odysee.com/@fireship/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu" target="_blank">odysee</a>, or this <a href="https://youtu.be/DfJrL4LEXz0" target="_blank">YouTube</a> screenshot source, you'll see the shrunk controller with the speed indicator in the upper left corner:<br/>
+![Adjust Video Speed UI in upper-left corner](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/0-initalizeed-location.jpg)
+
+Now you'll see a speed indicator in top left corner. Hover over the indicator to reveal the controls to accelerate, slowdown, and quickly rewind or advance the video:<br/>
+![Adjust Video Speed UI open on hover](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/1-hover.jpg)
 
 ### Keyboard Shortcuts
 
