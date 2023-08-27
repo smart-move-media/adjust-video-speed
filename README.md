@@ -1,5 +1,5 @@
 # Adjust Video Speed
-\
+
 ![Adjust Video Speed logo](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/adjust-video-speed.logo.svg)
 
 ### WARNING: fork in public beta 2023-09
