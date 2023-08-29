@@ -4,11 +4,8 @@
 
 ### WARNING: fork in public beta 2023-09
 
-HTML5 video provides a native API to accelerate playback of any video. This Chrome extention allows you to change the video speed in different configurations; musical pitch, more fine-grained defaults, or your own custom array.
+HTML5 video provides a native API to accelerate playback of any video. This Chrome extention allows you to change the video speed in different configurations; *musical pitched* speeds (default),  *common* increments, or your you can edit the preferences to own custom speed-set.
 
-
-~~~## _[Install Chrome Extension](https://github.com/smart-move-media/adjust-video-speed)
-~~~
 
 ## Instructions
 ***Not in Chrome Store yet!***
@@ -17,21 +14,21 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 
   1. Go to repo at [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
   2. Download repo:
-      * Click on green [<> Code] button near top-middle
-      * bottom of dropdown, choose "Download ZIP"
+      * Click on green [ **Code ⯆** ] button near top-middle
+      * bottom of dropdown, choose **Download ZIP**`
       * unpack zip
   3. In Chrome, open extentions at `chrome://extensions`
       * In [Brave web browser](https://brave.com/), open extentions at `brave://extensions/`
   4. Turn on **Developer mode** switch on top-right
-  5. ( Load unpacked ) button
-  6. open where you cloned/unpacked zip to install
+  5. [ **Load unpacked** ] button
+  6. choose the folder where you cloned/unpacked zip
 
-## Usage
+### Usage
 
-After instalation, navigate to any page that offers HTML5 video (examples: <a href="https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html" target="_blank">rumble</a>, <a href="https://odysee.com/@fireship/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu" target="_blank">odysee</a>, or this <a href="https://youtu.be/DfJrL4LEXz0" target="_blank">YouTube</a> screenshot source, you'll see the shrunk controller with the speed indicator in the upper left corner:<br/>
+After instalation, navigate to any page that offers HTML5 video (examples: <a href="https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html" target="_blank">rumble</a>, <a href="https://odysee.com/@fireship/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu" target="_blank">odysee</a>, or this <a href="https://youtu.be/DfJrL4LEXz0" target="_blank">YouTube</a> screenshot source), you'll see the minimized controller with the speed indicator in the upper left corner:<br/>
 ![Adjust Video Speed UI in upper-left corner](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/0-initalizeed-location.jpg)
 
-Now you'll see a speed indicator in top left corner. Hover over the indicator to reveal the controls to accelerate, slowdown, and quickly rewind or advance the video:<br/>
+Now you'll see a speed indicator in top left corner. Hover over the indicator to reveal the buttons to accelerate [**+**], slowdown [**-**], and quickly rewind [**«**] or advance [**»**] the video.  The right [**⯆**] button will open the config to change the array of speed settings.<br/>
 ![Adjust Video Speed UI open on hover](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/1-hover.jpg)
 
 ### Keyboard Shortcuts
@@ -42,18 +39,21 @@ Now you'll see a speed indicator in top left corner. Hover over the indicator to
 - **X** - advance video by 10 seconds
 - **V** - hide/show the controller
 
-This extension listens both for lower and upper case values (i.e. you can use `Shift-<shortcut>`) if there is other functionality assigned to the lowercase key.
+This extension listens both for lower and upper case values (i.e. use `Shift-<shortcut>`) if there is other functionality assigned to the lowercase key.
 
-### Configuration
+### Preferences
 
-You can customize and reassign the default shortcut keys in the extensions settings page as well as add additional shortcut keys to match your preferences by editing the JSON.
+You can customize and reassign the default shortcut keys, as well edit the steps in which you increase/decrease stpes (`speedSets`), change the displayed `speedTemplate`, & more configurations by editing the JSON:
 
-1. In a new tab, navigate to `chrome://extensions`
+1. In a new tab, navigate to `chrome://extensions`, `brave://extensions`, etc
 2. Find "Adjust Video Speed" extension
-3. Click on `Extention Options` down in the details
+3. Click on [ Details ] button
+3. Click on `Extention Options` down
 4. Edit the JSON
     - copy/paste configs if you want
     - [CTRL-s] to save, [CTRL-o] to open
+5. click on [ Save from RawJSON ]
+
 
 ## FAQ
 
@@ -65,11 +65,13 @@ Also some code added from [Mitch Capper](https://github.com/mitchcapper/videospe
 **Science of accelerated playback**: _TL;DR: faster playback translates to better engagement and retention._
 
 The average adult reads prose text at [250 to 300 words per minute](http://www.paperbecause.com/PIOP/files/f7/f7bb6bc5-2c4a-466f-9ae7-b483a2c0dca4.pdf) (wpm). By contrast, the average rate of speech for English speakers is ~150 wpm,
-with slide presentations often closer to 100 wpm. As a result, when given the choice, many viewers [speed up video playback to ~1.3\~1.5 its recorded rate](http://research.microsoft.com/en-us/um/redmond/groups/coet/compression/chi99/paper.pdf) to compensate for the difference.
+with slide presentations often closer to 100 wpm. As a result, when given the choice, some viewers [speed up video playback to ~1.3\~1.5 its recorded rate](http://research.microsoft.com/en-us/um/redmond/groups/coet/compression/chi99/paper.pdf) to compensate for the difference.
 
-Many viewers report that [accelerated viewing keeps their attention longer](http://www.enounce.com/docs/BYUPaper020319.pdf): faster delivery keeps the viewer more engaged with the content. In fact, with a little training many end up watching videos at 2x the recorded speed. Some studies report that after being exposed to accelerated playback, [listeners become uncomfortable](http://alumni.media.mit.edu/~barons/html/avios92.html#beasleyalteredspeech) if they are forced to return to normal rate of presentation.
+Many viewers report that [accelerated viewing keeps their attention longer](http://www.enounce.com/docs/BYUPaper020319.pdf). In fact, with a little training many end up watching videos at 2x the recorded speed. Some studies report that after being exposed to accelerated playback, [listeners become uncomfortable](http://alumni.media.mit.edu/~barons/html/avios92.html#beasleyalteredspeech) if they are forced to return to normal rate of presentation.
 
-**Video controls are not showing up?** This extension is only compatible with HTML5 video.
+That said, some people with neurodivergance (concussion, ADHD, etc) or others who are multitasking may find slower videos helps with understanding.  "Adjust Video Speed" assists everyone get the speed that they prefer!
+
+**Video controls are not showing up?** This extension is only compatible with HTML5 video players, and a few rare sites do break this.
 
 **The speed controls are not showing up for local videos?** To enable playback of local media (e.g. File > Open File), you need to grant additional permissions to the extension.
 
@@ -80,7 +82,7 @@ Many viewers report that [accelerated viewing keeps their attention longer](http
 
 ### Development
 
-The SVG files in the `/icons` folder are **not used** by Chrome, but are used to create the PNG files:
+The SVG files in the `/icons` folder are **not used** by Chrome, but for creation of the PNG files:
 ```bash
   inkscape -w 16 -h 16 -o icon16.png icon128.svg
   inkscape -w 32 -h 32 -o icon32.png icon128.svg
@@ -104,6 +106,6 @@ The SVG files in the `/icons` folder are **not used** by Chrome, but are used to
 ### License
 
 (MIT License)
-- Copyright (c) 2014 Ilya Grigorik
-- Copyright (c) 2023 Mitch Capper
-- Copyright (c) 2023 Tom Byrer
+- Copyright (c) 2014 [Ilya Grigorik](https://github.com/igrigorik)
+- Copyright (c) 2023 [Mitch Capper](https://github.com/mitchcapper)
+- Copyright (c) 2023 [Tom Byrer](https://github.com/tomByrer)
