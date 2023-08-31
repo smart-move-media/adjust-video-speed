@@ -4,7 +4,7 @@
 
 ### WARNING: fork in public beta 2023-09
 
-HTML5 video provides a native API to accelerate playback of any video. This Chrome extention allows you to change the video speed in different configurations; *musical pitched* speeds (default),  *common* increments, or your you can edit the preferences to own custom speed-set.
+HTML5 video provides a native API to accelerate playback of any video. This Chrome extention allows you to change the video speed in different configurations; *musical pitched* speeds (default), *common* increments, or your you can edit the preferences to own custom speed-set.
 
 
 ## Instructions
@@ -15,7 +15,7 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
   1. Go to repo at [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
   2. Download repo:
       * Click on green [ **Code ⯆** ] button near top-middle
-      * bottom of dropdown, choose **Download ZIP**`
+      * bottom of dropdown, choose **Download ZIP**
       * unpack zip
   3. In Chrome, open extentions at `chrome://extensions`
       * In [Brave web browser](https://brave.com/), open extentions at `brave://extensions/`
@@ -28,7 +28,9 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 After instalation, navigate to any page that offers HTML5 video (examples: <a href="https://rumble.com/v2bmh7d-oatmeal-cake-and-brown-sugar-glaze-old-fashioned-goodness-heirloom-recipe-t.html" target="_blank">rumble</a>, <a href="https://odysee.com/@fireship/cpu-vs-gpu-vs-tpu-vs-dpu-vs-qpu" target="_blank">odysee</a>, or this <a href="https://youtu.be/DfJrL4LEXz0" target="_blank">YouTube</a> screenshot source), you'll see the minimized controller with the speed indicator in the upper left corner:<br/>
 ![Adjust Video Speed UI in upper-left corner](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/0-initalizeed-location.jpg)
 
-Now you'll see a speed indicator in top left corner. Hover over the indicator to reveal the buttons to accelerate [**+**], slowdown [**-**], and quickly rewind [**«**] or advance [**»**] the video.  The right [**⯆**] button will open the config to change the array of speed settings.<br/>
+Now you'll see a speed indicator in top left corner. On some sites, like YouTube, Adjust Video Speed will hide with the video player hides.  The speed indicator will re-appear when you mouse over the video player so all the controlls appear.
+
+Hover over the indicator to reveal the buttons to accelerate [**+**], slowdown [**-**], and quickly rewind [**«**] or advance [**»**] the video.  The right [**⯆**] button will open the config to change the array of speed settings.<br/>
 ![Adjust Video Speed UI open on hover](https://raw.githubusercontent.com/smart-move-media/adjust-video-speed/master/img/1-hover.jpg)
 
 ### Keyboard Shortcuts
