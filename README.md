@@ -12,16 +12,14 @@ HTML5 video provides a native API to accelerate playback of any video. This Chro
 
 ### Manual Installation
 
-  1. Go to repo at [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
-  2. Download repo:
-      * Click on green [ **Code ⯆** ] button near top-middle
-      * bottom of dropdown, choose **Download ZIP**
-      * unpack zip
-  3. In Chrome, open extentions at `chrome://extensions`
+Detailed instructions for how to [install a browser extension is at DEV.to](https://dev.to/tombyrer/installing-chrome-extension-from-raw-source-code-2m4), but here is the short version:
+
+  1. Download/unpack [github.com/smart-move-media/adjust-video-speed](https://github.com/smart-move-media/adjust-video-speed)
+  2. In Chrome, open extentions at `chrome://extensions`
       * In [Brave web browser](https://brave.com/), open extentions at `brave://extensions/`
-  4. Turn on **Developer mode** switch on top-right
-  5. [ **Load unpacked** ] button
-  6. choose the folder where you cloned/unpacked zip
+  3. Turn on **Developer mode** switch on top-right
+  4. [ **Load unpacked** ] button
+  5. choose the folder where you cloned/unpacked zip
 
 ### Usage
 
